@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SosialKita — Social Media Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --sk-rose: #F43F5E;
+    --sk-rose-light: #FECDD3;
+    --sk-rose-dark: #9F1239;
+    --sk-orange: #FB923C;
+    --sk-violet: #8B5CF6;
+    --sk-violet-light: #EDE9FE;
+    --sk-dark: #0F0A1A;
+    --sk-dark2: #1A1028;
+    --sk-card: #22163A;
+    --sk-muted: #6B5F82;
+    --sk-white: #FAF8FF;
+    --sk-border: rgba(255,255,255,0.08);
+    --gradient: linear-gradient(135deg, var(--sk-rose), var(--sk-violet));
+    --gradient-btn: linear-gradient(90deg, #F43F5E, #8B5CF6);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: #0F0A1A;
+    color: var(--sk-white);
+    min-height: 100vh;
+    padding: 2rem 1rem 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  h1.page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--sk-muted);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: -1rem;
+  }
+
+  /* ── Device wrapper ── */
+  .device-row {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .device-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--sk-muted);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Phone frame ── */
+  .phone {
+    width: 300px;
+    flex-shrink: 0;
+  }
+  .phone-frame {
+    width: 300px;
+    height: 600px;
+    background: var(--sk-dark2);
+    border-radius: 36px;
+    border: 2px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .phone-notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 90px; height: 26px;
+    background: var(--sk-dark2);
+    border-radius: 0 0 18px 18px;
+    z-index: 20;
+  }
+  .phone-screen {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── Tablet frame ── */
+  .tablet {
+    width: 380px;
+    flex-shrink: 0;
+  }
+  .tablet-frame {
+    width: 380px;
+    height: 520px;
+    background: var(--sk-dark2);
+    border-radius: 20px;
+    border: 2px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  /* ── Desktop frame ── */
+  .desktop-wrap { width: 100%; max-width: 860px; }
+  .desktop-bar {
+    background: #2a1f40;
+    border-radius: 12px 12px 0 0;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-bottom: none;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 7px;
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot-r { background: #FF5F57; }
+  .dot-y { background: #FEBC2E; }
+  .dot-g { background: #28C840; }
+  .desktop-frame {
+    background: var(--sk-dark2);
+    border: 2px solid rgba(255,255,255,0.08);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    height: 500px;
+    position: relative;
+  }
+
+  /* ══════════════════════════════
+     SCREEN: SPLASH
+  ══════════════════════════════ */
+  .splash {
+    width: 100%; height: 100%;
+    background: var(--sk-dark);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .splash-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+    animation: pulse 4s ease-in-out infinite;
+  }
+  .splash-orb-1 {
+    width: 220px; height: 220px;
+    background: var(--sk-rose);
+    top: -60px; right: -60px;
+  }
+  .splash-orb-2 {
+    width: 200px; height: 200px;
+    background: var(--sk-violet);
+    bottom: -50px; left: -50px;
+    animation-delay: 2s;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.05); }
+  }
+  .splash-logo {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 16px;
+  }
+  .logo-icon {
+    width: 76px; height: 76px;
+    background: var(--gradient);
+    border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; color: #fff;
+    box-shadow: 0 8px 32px rgba(244,63,94,0.4);
+  }
+  .logo-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .logo-tagline {
+    font-size: 0.8rem;
+    color: var(--sk-muted);
+    letter-spacing: 0.05em;
+  }
+  .splash-dots {
+    position: absolute; bottom: 40px; z-index: 2;
+    display: flex; gap: 6px;
+  }
+  .sp-dot {
+    width: 6px; height: 6px; border-radius: 3px;
+    background: var(--sk-muted);
+  }
+  .sp-dot.active {
+    width: 20px;
+    background: var(--gradient-btn);
+    background: linear-gradient(90deg, var(--sk-rose), var(--sk-violet));
+  }
+
+  /* ══════════════════════════════
+     SCREEN: ONBOARDING
+  ══════════════════════════════ */
+  .onboard {
+    width: 100%; height: 100%;
+    background: var(--sk-dark);
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+  }
+  .onboard-art {
+    height: 52%;
+    position: relative;
+    background: linear-gradient(160deg, #1A0D2E 0%, #2D0B2E 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .onboard-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(50px);
+  }
+  .ob1 { width:180px;height:180px;background:#F43F5E;opacity:0.25;top:-30px;left:-30px; }
+  .ob2 { width:140px;height:140px;background:#8B5CF6;opacity:0.3;bottom:10px;right:-20px; }
+  .ob3 { width:100px;height:100px;background:#FB923C;opacity:0.2;bottom:-20px;left:40px; }
+  .onboard-illus {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .mini-post {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    backdrop-filter: blur(8px);
+    animation: float 3s ease-in-out infinite;
+  }
+  .mini-post:nth-child(2) { animation-delay: 1s; width: 85%; }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  .mp-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+  }
+  .mp-a1 { background: linear-gradient(135deg,#F43F5E,#8B5CF6); }
+  .mp-a2 { background: linear-gradient(135deg,#FB923C,#F43F5E); }
+  .mp-text { flex:1; }
+  .mp-name { font-size: 9px; font-weight: 600; color: var(--sk-white); }
+  .mp-desc { font-size: 8px; color: var(--sk-muted); margin-top: 2px; }
+  .mp-like { font-size: 11px; color: var(--sk-rose); display: flex; align-items: center; gap: 3px; }
+  .mp-like span { font-size: 8px; color: var(--sk-muted); }
+
+  .onboard-body {
+    padding: 24px 24px 20px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .onboard-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(244,63,94,0.15);
+    border: 1px solid rgba(244,63,94,0.25);
+    padding: 4px 12px; border-radius: 100px;
+    font-size: 10px; font-weight: 500; color: #F9A8B8;
+    width: fit-content;
+  }
+  .onboard-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem; font-weight: 800; line-height: 1.2;
+    color: var(--sk-white);
+  }
+  .onboard-title span {
+    background: var(--gradient);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .onboard-desc {
+    font-size: 0.78rem; color: var(--sk-muted); line-height: 1.6;
+  }
+  .btn-primary {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px; border-radius: 14px;
+    background: var(--gradient-btn);
+    color: white; font-size: 0.85rem; font-weight: 600;
+    border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: none;
+  }
+  .btn-secondary {
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px; border-radius: 14px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--sk-muted); font-size: 0.8rem;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    text-decoration: none;
+  }
+
+  /* ══════════════════════════════
+     SCREEN: LOGIN
+  ══════════════════════════════ */
+  .login-screen {
+    width: 100%; height: 100%;
+    background: var(--sk-dark);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+  .login-header {
+    padding: 40px 24px 20px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .login-logo {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  }
+  .login-logo-icon {
+    width: 32px; height: 32px;
+    background: var(--gradient);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .login-logo-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .login-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem; font-weight: 700;
+    color: var(--sk-white);
+  }
+  .login-sub { font-size: 0.75rem; color: var(--sk-muted); margin-top: 2px; }
+  .login-form {
+    padding: 0 24px;
+    display: flex; flex-direction: column; gap: 12px;
+    flex: 1;
+  }
+  .form-field { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 0.7rem; font-weight: 500; color: var(--sk-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .form-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 10px 14px;
+    color: var(--sk-white); font-size: 0.82rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .form-input-icon { color: var(--sk-muted); font-size: 15px; }
+  .form-input-text { color: var(--sk-muted); font-size: 0.82rem; }
+  .form-input-text.filled { color: var(--sk-white); }
+  .form-input-pw {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .forgot { font-size: 0.72rem; color: var(--sk-rose); text-align: right; }
+  .divider {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.7rem; color: var(--sk-muted);
+    padding: 4px 0;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1;
+    height: 1px; background: rgba(255,255,255,0.07);
+  }
+  .social-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px; border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--sk-white); font-size: 0.78rem;
+    cursor: pointer;
+  }
+  .login-footer {
+    padding: 16px 24px 24px;
+    text-align: center;
+    font-size: 0.72rem; color: var(--sk-muted);
+  }
+  .login-footer a { color: var(--sk-rose); text-decoration: none; font-weight: 500; }
+
+  /* ══════════════════════════════
+     SCREEN: HOME FEED
+  ══════════════════════════════ */
+  .home-screen {
+    width: 100%; height: 100%;
+    background: var(--sk-dark);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .home-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 36px 16px 12px;
+  }
+  .topbar-logo {
+    font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+    background: var(--gradient);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .topbar-actions { display: flex; gap: 4px; }
+  .topbar-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--sk-white); font-size: 15px; position: relative;
+  }
+  .notif-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px; background: var(--sk-rose); border-radius: 50%;
+    border: 1.5px solid var(--sk-dark);
+  }
+  .stories-row {
+    display: flex; gap: 10px;
+    padding: 0 16px 12px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .story-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    flex-shrink: 0;
+  }
+  .story-ring {
+    width: 50px; height: 50px; border-radius: 50%;
+    padding: 2px;
+    background: var(--gradient-btn);
+    background: linear-gradient(135deg, var(--sk-rose), var(--sk-violet));
+  }
+  .story-ring.add {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--sk-muted); font-size: 20px;
+  }
+  .story-avatar {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: var(--sk-card);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+    border: 2px solid var(--sk-dark);
+  }
+  .s1 { background: linear-gradient(135deg,#FF6B9D,#FF8E53); }
+  .s2 { background: linear-gradient(135deg,#4F9EFF,#9B59FF); }
+  .s3 { background: linear-gradient(135deg,#43E97B,#38F9D7); }
+  .s4 { background: linear-gradient(135deg,#F093FB,#F5576C); }
+  .story-name { font-size: 9px; color: var(--sk-muted); text-align: center; width: 54px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .feed { flex: 1; overflow-y: auto; scrollbar-width: none; }
+  .post-card {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .post-av {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; flex-shrink: 0;
+  }
+  .post-info { flex: 1; }
+  .post-name { font-size: 0.78rem; font-weight: 600; color: var(--sk-white); }
+  .post-meta { font-size: 0.65rem; color: var(--sk-muted); }
+  .post-more { color: var(--sk-muted); font-size: 16px; }
+  .post-image {
+    width: 100%; border-radius: 12px; overflow: hidden;
+    margin-bottom: 10px; background: var(--sk-card);
+    height: 140px; display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    background: linear-gradient(160deg, #1E103A, #2D1040);
+  }
+  .post-caption { font-size: 0.74rem; color: #C4B5D4; margin-bottom: 10px; line-height: 1.5; }
+  .post-actions { display: flex; align-items: center; gap: 14px; }
+  .post-act {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.7rem; color: var(--sk-muted);
+  }
+  .post-act i { font-size: 15px; }
+  .post-act.liked { color: var(--sk-rose); }
+  .act-spacer { flex: 1; }
+
+  .home-nav {
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 10px 0 20px;
+    background: rgba(15,10,26,0.95);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--sk-muted); font-size: 20px; cursor: pointer;
+  }
+  .nav-item.active { color: var(--sk-rose); }
+  .nav-item span { font-size: 9px; }
+  .nav-create {
+    width: 42px; height: 42px; border-radius: 14px;
+    background: var(--gradient-btn);
+    background: linear-gradient(135deg, var(--sk-rose), var(--sk-violet));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: white;
+  }
+
+  /* ══════════════════════════════
+     DESKTOP: HOME FEED
+  ══════════════════════════════ */
+  .desktop-home {
+    width: 100%; height: 100%;
+    background: var(--sk-dark);
+    display: flex;
+  }
+  .desk-sidebar {
+    width: 200px; flex-shrink: 0;
+    padding: 24px 16px;
+    border-right: 1px solid rgba(255,255,255,0.05);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .desk-logo {
+    font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800;
+    background: var(--gradient);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 0 8px 16px;
+  }
+  .desk-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 10px;
+    font-size: 0.82rem; color: var(--sk-muted); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .desk-nav-item i { font-size: 18px; }
+  .desk-nav-item.active { background: rgba(244,63,94,0.12); color: var(--sk-rose); }
+  .desk-nav-item.active .nav-dot {
+    width: 5px; height: 5px; border-radius: 50%; background: var(--sk-rose); margin-left: auto;
+  }
+  .desk-create {
+    margin-top: auto;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px; border-radius: 12px;
+    background: var(--gradient-btn);
+    background: linear-gradient(90deg, var(--sk-rose), var(--sk-violet));
+    color: white; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  }
+
+  .desk-main {
+    flex: 1; overflow-y: auto;
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 0;
+    scrollbar-width: none;
+  }
+  .desk-topbar {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .desk-search {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 8px 14px;
+    display: flex; align-items: center; gap: 8px;
+    color: var(--sk-muted); font-size: 0.8rem;
+  }
+  .desk-stories {
+    display: flex; gap: 12px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none;
+  }
+  .desk-story {
+    flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  }
+  .desk-story-ring {
+    width: 58px; height: 58px; border-radius: 50%;
+    padding: 2.5px;
+    background: linear-gradient(135deg, var(--sk-rose), var(--sk-violet));
+  }
+  .desk-story-av {
+    width: 100%; height: 100%; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600;
+    border: 2.5px solid var(--sk-dark);
+  }
+  .desk-story-name { font-size: 10px; color: var(--sk-muted); }
+
+  .desk-post {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .desk-post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .desk-post-av {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600; flex-shrink: 0;
+  }
+  .desk-post-info { flex: 1; }
+  .desk-post-name { font-size: 0.85rem; font-weight: 600; color: var(--sk-white); }
+  .desk-post-meta { font-size: 0.7rem; color: var(--sk-muted); }
+  .desk-post-follow {
+    padding: 5px 14px; border-radius: 100px;
+    border: 1px solid rgba(244,63,94,0.4);
+    color: var(--sk-rose); font-size: 0.72rem; font-weight: 500; cursor: pointer;
+  }
+  .desk-post-img {
+    width: 100%; border-radius: 10px; overflow: hidden;
+    height: 180px; margin-bottom: 12px;
+    background: linear-gradient(160deg, #1E103A, #2D1040);
+    display: flex; align-items: center; justify-content: center; font-size: 40px;
+  }
+  .desk-post-caption { font-size: 0.8rem; color: #C4B5D4; margin-bottom: 12px; line-height: 1.5; }
+  .desk-post-actions { display: flex; align-items: center; gap: 16px; }
+  .desk-act {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.75rem; color: var(--sk-muted); cursor: pointer;
+  }
+  .desk-act i { font-size: 16px; }
+  .desk-act.liked { color: var(--sk-rose); }
+
+  .desk-right {
+    width: 240px; flex-shrink: 0;
+    padding: 24px 16px;
+    border-left: 1px solid rgba(255,255,255,0.05);
+    display: flex; flex-direction: column; gap: 16px;
+    overflow-y: auto; scrollbar-width: none;
+  }
+  .desk-widget-title {
+    font-size: 0.72rem; font-weight: 600; color: var(--sk-muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+  }
+  .suggest-user {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .su-av {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+  }
+  .su-info { flex: 1; }
+  .su-name { font-size: 0.75rem; font-weight: 500; color: var(--sk-white); }
+  .su-handle { font-size: 0.65rem; color: var(--sk-muted); }
+  .su-follow {
+    padding: 4px 10px; border-radius: 100px;
+    background: rgba(244,63,94,0.15);
+    border: 1px solid rgba(244,63,94,0.2);
+    color: var(--sk-rose); font-size: 0.65rem; font-weight: 500; cursor: pointer;
+  }
+  .trending-tag {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .tt-num { font-size: 0.7rem; color: var(--sk-muted); width: 16px; }
+  .tt-info { flex: 1; }
+  .tt-tag { font-size: 0.78rem; font-weight: 600; color: var(--sk-white); }
+  .tt-posts { font-size: 0.65rem; color: var(--sk-muted); }
+  .tt-icon { color: var(--sk-rose); font-size: 14px; }
+
+  /* Section dividers */
+  .section-heading {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--sk-muted);
+    text-align: center;
+    margin: 0.5rem 0;
+  }
+
+  /* Tab selector */
+  .screen-tabs {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    justify-content: center;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 8px;
+    max-width: 800px;
+    width: 100%;
+  }
+  .stab {
+    padding: 6px 14px; border-radius: 8px;
+    font-size: 0.75rem; font-weight: 500;
+    cursor: pointer; border: none;
+    background: transparent; color: var(--sk-muted);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .stab.active {
+    background: var(--gradient-btn);
+    background: linear-gradient(90deg, var(--sk-rose), var(--sk-violet));
+    color: white;
+  }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">SosialKita — Tampilan UI Aplikasi</h1>
+<p style="color:#6B5F82;font-size:0.75rem;text-align:center;margin-top:-2rem;">Social Media Platform · Flutter Multiplatform</p>
+
+<!-- ████ ROW 1: MOBILE SCREENS ████ -->
+<div class="section-heading">📱 Mobile</div>
+<div class="device-row">
+
+  <!-- SPLASH -->
+  <div class="phone">
+    <div class="device-label">1. Splash Screen</div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="splash">
+          <div class="splash-orb splash-orb-1"></div>
+          <div class="splash-orb splash-orb-2"></div>
+          <div class="splash-logo">
+            <div class="logo-icon"><i class="ti ti-brand-instagram" aria-hidden="true"></i></div>
+            <div class="logo-name">SosialKita</div>
+            <div class="logo-tagline">Terhubung. Berbagi. Berkembang.</div>
+          </div>
+          <div class="splash-dots">
+            <div class="sp-dot active"></div>
+            <div class="sp-dot"></div>
+            <div class="sp-dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONBOARDING -->
+  <div class="phone">
+    <div class="device-label">2. Onboarding</div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="onboard">
+          <div class="onboard-art">
+            <div class="onboard-blob ob1"></div>
+            <div class="onboard-blob ob2"></div>
+            <div class="onboard-blob ob3"></div>
+            <div class="onboard-illus">
+              <div class="mini-post" style="width:230px">
+                <div class="mp-avatar mp-a1">AY</div>
+                <div class="mp-text">
+                  <div class="mp-name">Andi Yusuf</div>
+                  <div class="mp-desc">Sunset di Pantai Losari ✨</div>
+                </div>
+                <div class="mp-like"><i class="ti ti-heart-filled" aria-hidden="true"></i><span>1.2k</span></div>
+              </div>
+              <div class="mini-post" style="width:200px">
+                <div class="mp-avatar mp-a2">SR</div>
+                <div class="mp-text">
+                  <div class="mp-name">Siti Rahma</div>
+                  <div class="mp-desc">Coto Makassar terenak! 🍲</div>
+                </div>
+                <div class="mp-like"><i class="ti ti-heart-filled" aria-hidden="true"></i><span>843</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="onboard-body">
+            <div class="onboard-pill">
+              <i class="ti ti-sparkles" style="font-size:10px" aria-hidden="true"></i>
+              Bergabung Sekarang
+            </div>
+            <div class="onboard-title">Bagikan <span>Momen</span> Terbaikmu</div>
+            <div class="onboard-desc">Upload foto, ikuti teman, beri like dan komentar. Semua dalam satu platform.</div>
+            <a href="#" class="btn-primary">
+              Mulai Sekarang <i class="ti ti-arrow-right" aria-hidden="true"></i>
+            </a>
+            <a href="#" class="btn-secondary">Sudah punya akun? Masuk</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="phone">
+    <div class="device-label">3. Login</div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="login-screen">
+          <div class="login-header">
+            <div class="login-logo">
+              <div class="login-logo-icon"><i class="ti ti-brand-instagram" style="font-size:15px;color:white" aria-hidden="true"></i></div>
+              <div class="login-logo-name">SosialKita</div>
+            </div>
+            <div class="login-title">Selamat Datang 👋</div>
+            <div class="login-sub">Masuk ke akun kamu</div>
+          </div>
+          <div class="login-form">
+            <div class="form-field">
+              <div class="form-label">Email / Username</div>
+              <div class="form-input">
+                <i class="ti ti-mail form-input-icon" aria-hidden="true"></i>
+                <span class="form-input-text filled">andi@email.com</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <div class="form-label">Password</div>
+              <div class="form-input form-input-pw">
+                <span style="display:flex;align-items:center;gap:8px;flex:1">
+                  <i class="ti ti-lock form-input-icon" aria-hidden="true"></i>
+                  <span class="form-input-text filled">••••••••</span>
+                </span>
+                <i class="ti ti-eye form-input-icon" aria-hidden="true"></i>
+              </div>
+              <div class="forgot">Lupa password?</div>
+            </div>
+            <a href="#" class="btn-primary" style="margin-top:4px">
+              <i class="ti ti-login" aria-hidden="true"></i> Masuk
+            </a>
+            <div class="divider">atau lanjutkan dengan</div>
+            <div class="social-btn">
+              <i class="ti ti-brand-google" style="font-size:16px;color:#EA4335" aria-hidden="true"></i>
+              <span>Google</span>
+            </div>
+          </div>
+          <div class="login-footer">
+            Belum punya akun? <a href="#">Daftar sekarang</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME FEED MOBILE -->
+  <div class="phone">
+    <div class="device-label">4. Home Feed</div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="home-screen">
+          <div class="home-topbar">
+            <div class="topbar-logo">SosialKita</div>
+            <div class="topbar-actions">
+              <div class="topbar-btn">
+                <i class="ti ti-bell" aria-hidden="true"></i>
+                <div class="notif-dot"></div>
+              </div>
+              <div class="topbar-btn"><i class="ti ti-message-circle" aria-hidden="true"></i></div>
+            </div>
+          </div>
+
+          <!-- Stories -->
+          <div class="stories-row">
+            <div class="story-item">
+              <div class="story-ring add"><i class="ti ti-plus" aria-hidden="true"></i></div>
+              <div class="story-name">Kamu</div>
+            </div>
+            <div class="story-item">
+              <div class="story-ring"><div class="story-avatar s1">AY</div></div>
+              <div class="story-name">andi_y</div>
+            </div>
+            <div class="story-item">
+              <div class="story-ring"><div class="story-avatar s2">SR</div></div>
+              <div class="story-name">siti_r</div>
+            </div>
+            <div class="story-item">
+              <div class="story-ring"><div class="story-avatar s3">MB</div></div>
+              <div class="story-name">maulana</div>
+            </div>
+            <div class="story-item">
+              <div class="story-ring"><div class="story-avatar s4">FD</div></div>
+              <div class="story-name">fitri_d</div>
+            </div>
+          </div>
+
+          <!-- Feed -->
+          <div class="feed">
+            <!-- Post 1 -->
+            <div class="post-card">
+              <div class="post-header">
+                <div class="post-av s1">AY</div>
+                <div class="post-info">
+                  <div class="post-name">andi_yusuf</div>
+                  <div class="post-meta">Makassar · 2 jam lalu</div>
+                </div>
+                <i class="ti ti-dots post-more" aria-hidden="true"></i>
+              </div>
+              <div class="post-image" style="height:130px">🌅</div>
+              <div class="post-caption"><b style="color:#EEE">andi_yusuf</b> Sunset di Pantai Losari selalu bikin kagum. Golden hour yang sempurna! ✨ <span style="color:#8B5CF6">#SunsetLosari #Makassar</span></div>
+              <div class="post-actions">
+                <div class="post-act liked"><i class="ti ti-heart-filled" aria-hidden="true"></i> 1.2k</div>
+                <div class="post-act"><i class="ti ti-message-circle" aria-hidden="true"></i> 84</div>
+                <div class="post-act"><i class="ti ti-send" aria-hidden="true"></i></div>
+                <div class="act-spacer"></div>
+                <div class="post-act"><i class="ti ti-bookmark" aria-hidden="true"></i></div>
+              </div>
+            </div>
+
+            <!-- Post 2 -->
+            <div class="post-card">
+              <div class="post-header">
+                <div class="post-av s2">SR</div>
+                <div class="post-info">
+                  <div class="post-name">siti_rahma</div>
+                  <div class="post-meta">Gowa · 5 jam lalu</div>
+                </div>
+                <i class="ti ti-dots post-more" aria-hidden="true"></i>
+              </div>
+              <div class="post-caption" style="margin-bottom:8px"><b style="color:#EEE">siti_rahma</b> Coto Makassar terenak yang pernah aku coba! Kalian wajib kesini 🍲</div>
+              <div class="post-actions">
+                <div class="post-act"><i class="ti ti-heart" aria-hidden="true"></i> 843</div>
+                <div class="post-act"><i class="ti ti-message-circle" aria-hidden="true"></i> 62</div>
+                <div class="post-act"><i class="ti ti-send" aria-hidden="true"></i></div>
+                <div class="act-spacer"></div>
+                <div class="post-act"><i class="ti ti-bookmark" aria-hidden="true"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Nav -->
+          <div class="home-nav">
+            <div class="nav-item active"><i class="ti ti-home" aria-hidden="true"></i></div>
+            <div class="nav-item"><i class="ti ti-search" aria-hidden="true"></i></div>
+            <div class="nav-create"><i class="ti ti-plus" aria-hidden="true"></i></div>
+            <div class="nav-item"><i class="ti ti-heart" aria-hidden="true"></i></div>
+            <div class="nav-item"><i class="ti ti-user-circle" aria-hidden="true"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ ROW 2: DESKTOP ████ -->
+<div class="section-heading" style="margin-top:1rem">🖥️ Desktop — Home Feed</div>
+<div class="desktop-wrap">
+  <div class="desktop-bar">
+    <div class="dot dot-r"></div>
+    <div class="dot dot-y"></div>
+    <div class="dot dot-g"></div>
+    <div style="flex:1;margin:0 12px;background:rgba(255,255,255,0.05);border-radius:6px;height:18px;display:flex;align-items:center;padding:0 10px;gap:6px">
+      <i class="ti ti-lock" style="font-size:10px;color:#6B5F82" aria-hidden="true"></i>
+      <span style="font-size:10px;color:#6B5F82">sosialkita.app</span>
+    </div>
+  </div>
+  <div class="desktop-frame">
+    <div class="desktop-home">
+      <!-- Sidebar -->
+      <div class="desk-sidebar">
+        <div class="desk-logo">SosialKita</div>
+        <div class="desk-nav-item active">
+          <i class="ti ti-home" aria-hidden="true"></i> Beranda
+          <div class="nav-dot"></div>
+        </div>
+        <div class="desk-nav-item"><i class="ti ti-search" aria-hidden="true"></i> Cari</div>
+        <div class="desk-nav-item"><i class="ti ti-compass" aria-hidden="true"></i> Eksplorasi</div>
+        <div class="desk-nav-item"><i class="ti ti-bell" aria-hidden="true"></i> Notifikasi</div>
+        <div class="desk-nav-item"><i class="ti ti-message-circle" aria-hidden="true"></i> Pesan</div>
+        <div class="desk-nav-item"><i class="ti ti-bookmark" aria-hidden="true"></i> Tersimpan</div>
+        <div class="desk-nav-item"><i class="ti ti-user-circle" aria-hidden="true"></i> Profil</div>
+        <div class="desk-nav-item" style="margin-top:auto"><i class="ti ti-settings" aria-hidden="true"></i> Pengaturan</div>
+        <div class="desk-create" style="margin-top:8px">
+          <i class="ti ti-plus" aria-hidden="true"></i> Buat Postingan
+        </div>
+      </div>
+
+      <!-- Main feed -->
+      <div class="desk-main">
+        <!-- Topbar -->
+        <div class="desk-topbar">
+          <div class="desk-search">
+            <i class="ti ti-search" style="font-size:14px" aria-hidden="true"></i>
+            <span>Cari pengguna, postingan, atau tagar...</span>
+          </div>
+          <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#FF6B9D,#FF8E53);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white">AY</div>
+        </div>
+
+        <!-- Stories -->
+        <div class="desk-stories">
+          <div class="desk-story">
+            <div class="desk-story-ring" style="background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#6B5F82;font-size:22px">
+              <i class="ti ti-plus" aria-hidden="true"></i>
+            </div>
+            <div class="desk-story-name">Kamu</div>
+          </div>
+          <div class="desk-story">
+            <div class="desk-story-ring"><div class="desk-story-av s1" style="border:2.5px solid var(--sk-dark)">AY</div></div>
+            <div class="desk-story-name">andi_y</div>
+          </div>
+          <div class="desk-story">
+            <div class="desk-story-ring"><div class="desk-story-av s2" style="border:2.5px solid var(--sk-dark)">SR</div></div>
+            <div class="desk-story-name">siti_r</div>
+          </div>
+          <div class="desk-story">
+            <div class="desk-story-ring"><div class="desk-story-av s3" style="border:2.5px solid var(--sk-dark)">MB</div></div>
+            <div class="desk-story-name">maulana</div>
+          </div>
+          <div class="desk-story">
+            <div class="desk-story-ring"><div class="desk-story-av s4" style="border:2.5px solid var(--sk-dark)">FD</div></div>
+            <div class="desk-story-name">fitri_d</div>
+          </div>
+        </div>
+
+        <!-- Posts -->
+        <div class="desk-post">
+          <div class="desk-post-header">
+            <div class="desk-post-av s1">AY</div>
+            <div class="desk-post-info">
+              <div class="desk-post-name">andi_yusuf</div>
+              <div class="desk-post-meta">Makassar, Sulawesi Selatan · 2 jam lalu</div>
+            </div>
+            <div class="desk-post-follow">+ Follow</div>
+            <i class="ti ti-dots" style="color:#6B5F82;font-size:18px;margin-left:4px" aria-hidden="true"></i>
+          </div>
+          <div class="desk-post-img">🌅</div>
+          <div class="desk-post-caption"><b style="color:#EEE">andi_yusuf</b> Sunset di Pantai Losari selalu bikin kagum. Golden hour yang sempurna! Wajib dikunjungi kalau ke Makassar ✨ <span style="color:#8B5CF6">#SunsetLosari #Makassar #GoldenHour</span></div>
+          <div class="desk-post-actions">
+            <div class="desk-act liked"><i class="ti ti-heart-filled" aria-hidden="true"></i> 1.2k suka</div>
+            <div class="desk-act"><i class="ti ti-message-circle" aria-hidden="true"></i> 84 komentar</div>
+            <div class="desk-act"><i class="ti ti-send" aria-hidden="true"></i> Bagikan</div>
+            <div style="flex:1"></div>
+            <div class="desk-act"><i class="ti ti-bookmark" aria-hidden="true"></i> Simpan</div>
+          </div>
+        </div>
+
+        <div class="desk-post">
+          <div class="desk-post-header">
+            <div class="desk-post-av s2">SR</div>
+            <div class="desk-post-info">
+              <div class="desk-post-name">siti_rahma</div>
+              <div class="desk-post-meta">Gowa, Sulawesi Selatan · 5 jam lalu</div>
+            </div>
+            <i class="ti ti-dots" style="color:#6B5F82;font-size:18px;margin-left:auto" aria-hidden="true"></i>
+          </div>
+          <div class="desk-post-caption"><b style="color:#EEE">siti_rahma</b> Coto Makassar terenak yang pernah aku coba! Kalian wajib kesini kalau mampir ke Gowa 🍲❤️</div>
+          <div class="desk-post-actions">
+            <div class="desk-act"><i class="ti ti-heart" aria-hidden="true"></i> 843 suka</div>
+            <div class="desk-act"><i class="ti ti-message-circle" aria-hidden="true"></i> 62 komentar</div>
+            <div class="desk-act"><i class="ti ti-send" aria-hidden="true"></i> Bagikan</div>
+            <div style="flex:1"></div>
+            <div class="desk-act"><i class="ti ti-bookmark" aria-hidden="true"></i> Simpan</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right sidebar -->
+      <div class="desk-right">
+        <div>
+          <div class="desk-widget-title">Saran untuk Kamu</div>
+          <div class="suggest-user">
+            <div class="su-av s3">MB</div>
+            <div class="su-info">
+              <div class="su-name">Maulana Budi</div>
+              <div class="su-handle">@maulana_b · 3 teman bersama</div>
+            </div>
+            <div class="su-follow">Follow</div>
+          </div>
+          <div class="suggest-user">
+            <div class="su-av s4">FD</div>
+            <div class="su-info">
+              <div class="su-name">Fitri Dewi</div>
+              <div class="su-handle">@fitri_d · 1 teman bersama</div>
+            </div>
+            <div class="su-follow">Follow</div>
+          </div>
+          <div class="suggest-user">
+            <div class="su-av" style="background:linear-gradient(135deg,#43E97B,#38F9D7)">RH</div>
+            <div class="su-info">
+              <div class="su-name">Reza Hasni</div>
+              <div class="su-handle">@reza_h · Disarankan</div>
+            </div>
+            <div class="su-follow">Follow</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="desk-widget-title">Tren Saat Ini</div>
+          <div class="trending-tag">
+            <div class="tt-num">1</div>
+            <div class="tt-info">
+              <div class="tt-tag">#Makassar</div>
+              <div class="tt-posts">24.5k postingan</div>
+            </div>
+            <i class="ti ti-trending-up tt-icon" aria-hidden="true"></i>
+          </div>
+          <div class="trending-tag">
+            <div class="tt-num">2</div>
+            <div class="tt-info">
+              <div class="tt-tag">#KulinerSulsel</div>
+              <div class="tt-posts">11.2k postingan</div>
+            </div>
+            <i class="ti ti-trending-up tt-icon" aria-hidden="true"></i>
+          </div>
+          <div class="trending-tag">
+            <div class="tt-num">3</div>
+            <div class="tt-info">
+              <div class="tt-tag">#WisataIndonesia</div>
+              <div class="tt-posts">8.9k postingan</div>
+            </div>
+            <i class="ti ti-trending-up tt-icon" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer note -->
+<p style="color:#6B5F82;font-size:0.72rem;text-align:center;max-width:600px;line-height:1.7">
+  UI mockup ini mencakup: <b style="color:#C4B5D4">Splash Screen · Onboarding · Login · Home Feed</b> untuk mobile, serta tampilan <b style="color:#C4B5D4">Desktop</b>. Dibangun dengan Flutter + Backend pilihan (Firebase/Supabase/Laravel) sesuai syarat proyek.
+</p>
+
+</body>
+</html>
