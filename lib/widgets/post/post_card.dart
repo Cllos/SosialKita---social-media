@@ -147,6 +147,7 @@ class _PostCardState extends State<PostCard>
           child: Row(
             children: [
               SKAvatar(
+                imageUrl: user.avatarUrl,
                 initials: user.avatarInitials,
                 backgroundColor: user.avatarColor,
                 size: 36,

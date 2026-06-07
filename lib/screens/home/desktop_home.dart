@@ -185,6 +185,7 @@ class _DesktopHomeState extends State<DesktopHome> {
         SKAvatar(
           initials: currentUser.avatarInitials,
           backgroundColor: currentUser.avatarColor,
+          imageUrl: currentUser.avatarUrl,
           size: 38,
         ),
       ],

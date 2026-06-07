@@ -213,6 +213,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SKAvatar(
+                                    imageUrl: commentUser.avatarUrl,
                                     initials: commentUser.avatarInitials,
                                     backgroundColor: commentUser.avatarColor,
                                     size: 32,
@@ -300,6 +301,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             child: Row(
               children: [
                 SKAvatar(
+                  imageUrl: currentUser.avatarUrl,
                   initials: currentUser.avatarInitials,
                   backgroundColor: currentUser.avatarColor,
                   size: 32,

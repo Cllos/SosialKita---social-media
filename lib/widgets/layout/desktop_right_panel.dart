@@ -178,6 +178,7 @@ class _SuggestUserTile extends StatelessWidget {
       child: Row(
         children: [
           SKAvatar(
+            imageUrl: user.avatarUrl,
             initials: user.avatarInitials,
             backgroundColor: user.avatarColor,
             size: 34,

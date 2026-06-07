@@ -128,6 +128,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       children: [
                         // Avatar
                         SKAvatar(
+                          imageUrl: fromUser.avatarUrl,
                           initials: fromUser.avatarInitials,
                           backgroundColor: fromUser.avatarColor,
                           size: 40,

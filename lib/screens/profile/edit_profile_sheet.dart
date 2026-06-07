@@ -4,9 +4,10 @@ import '../../core/theme/app_colors.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
+import '../../widgets/common/sk_text_field.dart';
 
 /// EditProfileSheet — Bottom sheet / dialog untuk edit profil pengguna
-/// Mengubah displayName dan bio, lalu menyimpan ke AuthProvider
+/// Mengubah displayName, bio, avatarUrl, dan avatarColor
 class EditProfileSheet extends StatefulWidget {
   final UserModel user;
 
@@ -19,28 +20,65 @@ class EditProfileSheet extends StatefulWidget {
 class _EditProfileSheetState extends State<EditProfileSheet> {
   late TextEditingController _nameController;
   late TextEditingController _bioController;
+  late TextEditingController _avatarUrlController;
+  late Color _selectedColor;
   final _formKey = GlobalKey<FormState>();
+
+  final List<String> _sampleAvatars = [
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
+  ];
+
+  final List<Color> _avatarColors = [
+    AppColors.skRose,
+    AppColors.skViolet,
+    const Color(0xFFFB923C), // Orange
+    const Color(0xFF10B981), // Emerald
+    const Color(0xFF0EA5E9), // Sky Blue
+  ];
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.user.displayName);
     _bioController = TextEditingController(text: widget.user.bio);
+    _avatarUrlController = TextEditingController(text: widget.user.avatarUrl);
+    _selectedColor = widget.user.avatarColor;
+
+    // Trigger rebuild saat ada perubahan input nama/url gambar untuk real-time preview
+    _nameController.addListener(() => setState(() {}));
+    _avatarUrlController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _bioController.dispose();
+    _avatarUrlController.dispose();
     super.dispose();
+  }
+
+  String _getInitials(String name) {
+    if (name.isEmpty) return '??';
+    final parts = name.trim().split(' ');
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].substring(0, parts[0].length >= 2 ? 2 : 1).toUpperCase();
   }
 
   void _onSave() {
     if (!_formKey.currentState!.validate()) return;
 
+    final name = _nameController.text.trim();
     final updated = widget.user.copyWith(
-      displayName: _nameController.text.trim(),
+      displayName: name,
       bio: _bioController.text.trim(),
+      avatarUrl: _avatarUrlController.text.trim(),
+      avatarColor: _selectedColor,
+      avatarInitials: _getInitials(name),
     );
 
     context.read<AuthProvider>().updateProfile(updated);
@@ -48,7 +86,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Profil berhasil diperbarui'),
+        content: const Text('Profil berhasil diperbarui ✨'),
         backgroundColor: AppColors.skCard,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -107,9 +145,10 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                 child: Column(
                   children: [
                     SKAvatar(
-                      initials: widget.user.avatarInitials,
-                      backgroundColor: widget.user.avatarColor,
-                      size: 72,
+                      imageUrl: _avatarUrlController.text.trim(),
+                      initials: _getInitials(_nameController.text.trim()),
+                      backgroundColor: _selectedColor,
+                      size: 80,
                       showRing: true,
                     ),
                     const SizedBox(height: 8),
@@ -162,7 +201,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                   fontSize: 14,
                   color: AppColors.skWhite,
                 ),
-                maxLines: 3,
+                maxLines: 2,
                 maxLength: 150,
                 decoration: _inputDecoration(
                   hint: 'Ceritakan tentang dirimu...',
@@ -174,6 +213,121 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                     color: AppColors.skMuted.withOpacity(0.6),
                   ),
                 ),
+              ),
+              const SizedBox(height: 16),
+
+              // ── Preset Foto ──
+              _buildLabel('PILIH FOTO PROFIL PRESET'),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 52,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _sampleAvatars.length,
+                  itemBuilder: (context, idx) {
+                    final url = _sampleAvatars[idx];
+                    final isSelected = _avatarUrlController.text.trim() == url;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _avatarUrlController.text = url;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected ? AppColors.skRose : Colors.white12,
+                            width: isSelected ? 2 : 1,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: Image.network(
+                            url,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ── Preset Warna (Fallback jika tidak ada URL foto) ──
+              _buildLabel('WARNA AVATAR (CADANGAN FOTO)'),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 36,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _avatarColors.length,
+                  itemBuilder: (context, idx) {
+                    final color = _avatarColors[idx];
+                    final isSelected = _selectedColor == color;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedColor = color;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected ? Colors.white : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
+                        child: isSelected
+                            ? const Icon(Icons.check, color: Colors.white, size: 16)
+                            : null,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ── Reset Foto ──
+              if (_avatarUrlController.text.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _avatarUrlController.clear();
+                        });
+                      },
+                      icon: const Icon(Icons.refresh_rounded, color: AppColors.skRose, size: 16),
+                      label: const Text(
+                        'Hapus Foto (Gunakan Inisial)',
+                        style: TextStyle(
+                          color: AppColors.skRose,
+                          fontFamily: 'DM Sans',
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+              // ── URL Foto Kustom ──
+              SKTextField(
+                label: 'Atau Masukkan URL Foto Kustom',
+                hint: 'https://example.com/photo.jpg',
+                prefixIcon: Icons.link,
+                controller: _avatarUrlController,
               ),
               const SizedBox(height: 24),
 

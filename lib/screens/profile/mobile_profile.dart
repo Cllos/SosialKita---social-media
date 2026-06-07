@@ -7,6 +7,10 @@ import '../../providers/auth_provider.dart';
 import '../../providers/post_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
+import '../../providers/story_provider.dart';
+import '../../widgets/story/add_story_sheet.dart';
+import '../../widgets/profile/user_list_sheet.dart';
+import '../story/story_view_screen.dart';
 import 'edit_profile_sheet.dart';
 import '../post/post_detail_screen.dart';
 
@@ -185,6 +189,9 @@ class _MobileProfileState extends State<MobileProfile>
     int postCount,
     bool isOwn,
   ) {
+    final storyProvider = context.watch<StoryProvider>();
+    final hasStories = storyProvider.hasActiveStory(user.id);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(
@@ -193,12 +200,40 @@ class _MobileProfileState extends State<MobileProfile>
           // ── Row: Avatar + Stats ──
           Row(
             children: [
-              // Avatar besar
-              SKAvatar(
-                initials: user.avatarInitials,
-                backgroundColor: user.avatarColor,
-                size: 80,
-                showRing: true,
+              // Avatar besar (Tap untuk lihat story atau buat story jika kosong)
+              GestureDetector(
+                onTap: () {
+                  final stories = storyProvider.getStoriesByUser(user.id);
+                  if (stories.isNotEmpty) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => StoryViewScreen(stories: stories, user: user),
+                      ),
+                    );
+                  } else if (isOwn) {
+                    _showAddStorySheet(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('@${user.username} tidak memiliki cerita baru'),
+                        backgroundColor: AppColors.skCard,
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(seconds: 1),
+                      ),
+                    );
+                  }
+                },
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: SKAvatar(
+                    imageUrl: user.avatarUrl,
+                    initials: user.avatarInitials,
+                    backgroundColor: user.avatarColor,
+                    size: 80,
+                    showRing: hasStories,
+                  ),
+                ),
               ),
               const SizedBox(width: 24),
 
@@ -211,13 +246,45 @@ class _MobileProfileState extends State<MobileProfile>
                       count: postCount.toString(),
                       label: 'Postingan',
                     ),
-                    _StatItem(
-                      count: user.followers.length.toString(),
-                      label: 'Pengikut',
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => UserListSheet(
+                            title: 'Pengikut',
+                            userIds: user.followers,
+                          ),
+                        );
+                      },
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: _StatItem(
+                          count: user.followers.length.toString(),
+                          label: 'Pengikut',
+                        ),
+                      ),
                     ),
-                    _StatItem(
-                      count: user.following.length.toString(),
-                      label: 'Mengikuti',
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => UserListSheet(
+                            title: 'Mengikuti',
+                            userIds: user.following,
+                          ),
+                        );
+                      },
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: _StatItem(
+                          count: user.following.length.toString(),
+                          label: 'Mengikuti',
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -433,6 +500,15 @@ class _MobileProfileState extends State<MobileProfile>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => EditProfileSheet(user: user),
+    );
+  }
+
+  void _showAddStorySheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AddStorySheet(),
     );
   }
 

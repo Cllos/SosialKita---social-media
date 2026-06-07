@@ -7,6 +7,10 @@ import '../../providers/auth_provider.dart';
 import '../../providers/post_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
+import '../../providers/story_provider.dart';
+import '../../widgets/story/add_story_sheet.dart';
+import '../../widgets/profile/user_list_sheet.dart';
+import '../story/story_view_screen.dart';
 import '../../widgets/layout/desktop_sidebar.dart';
 import 'edit_profile_sheet.dart';
 import '../post/post_detail_screen.dart';
@@ -192,15 +196,46 @@ class _DesktopProfileState extends State<DesktopProfile>
     int postCount,
     bool isOwn,
   ) {
+    final storyProvider = context.watch<StoryProvider>();
+    final hasStories = storyProvider.hasActiveStory(user.id);
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Avatar besar
-        SKAvatar(
-          initials: user.avatarInitials,
-          backgroundColor: user.avatarColor,
-          size: 100,
-          showRing: true,
+        // Avatar besar (Tap untuk lihat story atau buat story jika kosong)
+        GestureDetector(
+          onTap: () {
+            final stories = storyProvider.getStoriesByUser(user.id);
+            if (stories.isNotEmpty) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => StoryViewScreen(stories: stories, user: user),
+                ),
+              );
+            } else if (isOwn) {
+              _showAddStorySheet(context);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('@${user.username} tidak memiliki cerita baru'),
+                  backgroundColor: AppColors.skCard,
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+            }
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: SKAvatar(
+              imageUrl: user.avatarUrl,
+              initials: user.avatarInitials,
+              backgroundColor: user.avatarColor,
+              size: 100,
+              showRing: hasStories,
+            ),
+          ),
         ),
         const SizedBox(width: 40),
 
@@ -272,14 +307,26 @@ class _DesktopProfileState extends State<DesktopProfile>
                 children: [
                   _DesktopStatItem(count: postCount, label: 'postingan'),
                   const SizedBox(width: 32),
-                  _DesktopStatItem(
-                    count: user.followers.length,
-                    label: 'pengikut',
+                  GestureDetector(
+                    onTap: () => _showUserListDialog(context, 'Pengikut', user.followers),
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: _DesktopStatItem(
+                        count: user.followers.length,
+                        label: 'pengikut',
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 32),
-                  _DesktopStatItem(
-                    count: user.following.length,
-                    label: 'mengikuti',
+                  GestureDetector(
+                    onTap: () => _showUserListDialog(context, 'Mengikuti', user.following),
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: _DesktopStatItem(
+                        count: user.following.length,
+                        label: 'mengikuti',
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -443,6 +490,40 @@ class _DesktopProfileState extends State<DesktopProfile>
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420, maxHeight: 480),
           child: EditProfileSheet(user: user),
+        ),
+      ),
+    );
+  }
+
+  void _showAddStorySheet(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: AppColors.skDark2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420, maxHeight: 600),
+          child: const AddStorySheet(),
+        ),
+      ),
+    );
+  }
+
+  void _showUserListDialog(BuildContext context, String title, List<String> userIds) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: AppColors.skDark2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420, maxHeight: 500),
+          child: UserListSheet(title: title, userIds: userIds),
         ),
       ),
     );

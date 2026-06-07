@@ -21,34 +21,74 @@ class SKAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasImage = imageUrl != null && imageUrl!.trim().isNotEmpty;
+
     final avatar = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [
-            backgroundColor,
-            backgroundColor.withOpacity(0.7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: hasImage ? Colors.transparent : null,
+        gradient: hasImage
+            ? null
+            : LinearGradient(
+                colors: [
+                  backgroundColor,
+                  backgroundColor.withOpacity(0.7),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         border: showRing
             ? Border.all(color: AppColors.skDark, width: 2)
             : null,
       ),
-      child: Center(
-        child: Text(
-          initials,
-          style: TextStyle(
-            fontFamily: 'DM Sans',
-            color: Colors.white,
-            fontSize: size * 0.35,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+      child: hasImage
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(size / 2),
+              child: Image.network(
+                imageUrl!,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          backgroundColor,
+                          backgroundColor.withOpacity(0.7),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        initials,
+                        style: TextStyle(
+                          fontFamily: 'DM Sans',
+                          color: Colors.white,
+                          fontSize: size * 0.35,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+          : Center(
+              child: Text(
+                initials,
+                style: TextStyle(
+                  fontFamily: 'DM Sans',
+                  color: Colors.white,
+                  fontSize: size * 0.35,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
     );
 
     if (!showRing) return avatar;

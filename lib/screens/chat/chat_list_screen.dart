@@ -172,6 +172,7 @@ class ChatListScreen extends StatelessWidget {
                                   SKAvatar(
                                     initials: peer.avatarInitials,
                                     backgroundColor: peer.avatarColor,
+                                    imageUrl: peer.avatarUrl,
                                     size: 44,
                                     // Beri ring gradient jika belum dibaca
                                     showRing: hasUnread,
@@ -358,6 +359,7 @@ class ChatListScreen extends StatelessWidget {
                             leading: SKAvatar(
                               initials: user.avatarInitials,
                               backgroundColor: user.avatarColor,
+                              imageUrl: user.avatarUrl,
                               size: 40,
                             ),
                             title: Text(

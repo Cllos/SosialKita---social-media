@@ -102,6 +102,7 @@ class ShareSheet extends StatelessWidget {
                           child: Column(
                             children: [
                               SKAvatar(
+                                imageUrl: friend.avatarUrl,
                                 initials: friend.avatarInitials,
                                 backgroundColor: friend.avatarColor,
                                 size: 48,

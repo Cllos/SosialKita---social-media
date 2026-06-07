@@ -659,6 +659,7 @@ class _UserResultTile extends StatelessWidget {
         child: Row(
           children: [
             SKAvatar(
+              imageUrl: user.avatarUrl,
               initials: user.avatarInitials,
               backgroundColor: user.avatarColor,
               size: 44,
@@ -808,6 +809,7 @@ class _PostResultTile extends StatelessWidget {
                   Row(
                     children: [
                       SKAvatar(
+                        imageUrl: user.avatarUrl,
                         initials: user.avatarInitials,
                         backgroundColor: user.avatarColor,
                         size: 20,

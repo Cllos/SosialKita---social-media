@@ -107,6 +107,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             SKAvatar(
               initials: widget.peer.avatarInitials,
               backgroundColor: widget.peer.avatarColor,
+              imageUrl: widget.peer.avatarUrl,
               size: 34,
             ),
             const SizedBox(width: 10),
@@ -274,6 +275,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             SKAvatar(
               initials: widget.peer.avatarInitials,
               backgroundColor: widget.peer.avatarColor,
+              imageUrl: widget.peer.avatarUrl,
               size: 24,
             ),
             const SizedBox(width: 8),

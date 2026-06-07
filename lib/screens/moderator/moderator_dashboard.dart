@@ -85,6 +85,7 @@ class ModeratorDashboard extends StatelessWidget {
               child: Row(
                 children: [
                   SKAvatar(
+                    imageUrl: currentUser.avatarUrl,
                     initials: currentUser.avatarInitials,
                     backgroundColor: currentUser.avatarColor,
                     size: 44,

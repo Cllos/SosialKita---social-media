@@ -92,6 +92,7 @@ class StoryRow extends StatelessWidget {
             children: [
               // Avatar lingkaran (ring menyala jika ada story aktif)
               SKAvatar(
+                imageUrl: me.avatarUrl,
                 initials: me.avatarInitials,
                 backgroundColor: me.avatarColor,
                 size: 48,
@@ -170,6 +171,7 @@ class StoryRow extends StatelessWidget {
       child: Column(
         children: [
           SKAvatar(
+            imageUrl: user.avatarUrl,
             initials: user.avatarInitials,
             backgroundColor: user.avatarColor,
             size: 48,

@@ -63,4 +63,10 @@ class StoryProvider extends ChangeNotifier {
     _stories.insert(0, newStory);
     notifyListeners();
   }
+
+  /// Menghapus cerita kustom berdasarkan ID
+  void deleteStory(String storyId) {
+    _stories.removeWhere((s) => s.id == storyId);
+    notifyListeners();
+  }
 }

@@ -167,6 +167,7 @@ class _CommentSheetState extends State<CommentSheet> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SKAvatar(
+                              imageUrl: commentUser.avatarUrl,
                               initials: commentUser.avatarInitials,
                               backgroundColor: commentUser.avatarColor,
                               size: 32,
@@ -251,6 +252,7 @@ class _CommentSheetState extends State<CommentSheet> {
             child: Row(
               children: [
                 SKAvatar(
+                  imageUrl: currentUser.avatarUrl,
                   initials: currentUser.avatarInitials,
                   backgroundColor: currentUser.avatarColor,
                   size: 32,

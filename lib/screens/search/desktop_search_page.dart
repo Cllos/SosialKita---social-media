@@ -710,6 +710,7 @@ class _DesktopUserResultTileState extends State<_DesktopUserResultTile> {
               SKAvatar(
                 initials: widget.user.avatarInitials,
                 backgroundColor: widget.user.avatarColor,
+                imageUrl: widget.user.avatarUrl,
                 size: 44,
               ),
               const SizedBox(width: 14),
@@ -845,6 +846,7 @@ class _DesktopPostResultTileState extends State<_DesktopPostResultTile> {
                         SKAvatar(
                           initials: widget.user.avatarInitials,
                           backgroundColor: widget.user.avatarColor,
+                          imageUrl: widget.user.avatarUrl,
                           size: 22,
                         ),
                         const SizedBox(width: 8),
