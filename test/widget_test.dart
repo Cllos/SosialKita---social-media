@@ -13,7 +13,6 @@ import 'package:sosialkita/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    TestWidgetsFlutterBinding.ensureInitialized();
     await tester.pumpWidget(const SosialKitaApp());
 
     // Verify that our counter starts at 0.
