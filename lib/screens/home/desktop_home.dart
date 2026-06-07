@@ -8,6 +8,7 @@ import '../../widgets/layout/desktop_right_panel.dart';
 import '../../widgets/post/post_card.dart';
 import '../../widgets/story/story_row.dart';
 import '../../widgets/common/sk_avatar.dart';
+import '../search/desktop_search_page.dart';
 
 /// DesktopHome — Layout desktop: sidebar kiri + feed tengah + panel kanan
 /// Sesuai design sosialkita_ui.html (.desktop-home)
@@ -139,32 +140,42 @@ class _DesktopHomeState extends State<DesktopHome> {
       children: [
         // Search bar
         Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.08),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const DesktopSearchPage(),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.08),
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.search,
-                  size: 16,
-                  color: AppColors.skMuted.withOpacity(0.6),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Cari pengguna, postingan, atau tagar...',
-                  style: TextStyle(
-                    fontFamily: 'DM Sans',
-                    fontSize: 13,
-                    color: AppColors.skMuted.withOpacity(0.5),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.search,
+                    size: 16,
+                    color: AppColors.skMuted.withOpacity(0.6),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    'Cari pengguna, postingan, atau tagar...',
+                    style: TextStyle(
+                      fontFamily: 'DM Sans',
+                      fontSize: 13,
+                      color: AppColors.skMuted.withOpacity(0.5),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

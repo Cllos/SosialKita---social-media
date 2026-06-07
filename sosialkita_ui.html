@@ -923,7 +923,10 @@
             <div class="nav-item active"><i class="ti ti-home" aria-hidden="true"></i></div>
             <div class="nav-item"><i class="ti ti-search" aria-hidden="true"></i></div>
             <div class="nav-create"><i class="ti ti-plus" aria-hidden="true"></i></div>
-            <div class="nav-item"><i class="ti ti-heart" aria-hidden="true"></i></div>
+            <div class="nav-item" style="position:relative">
+              <i class="ti ti-message-circle" aria-hidden="true"></i>
+              <div style="position:absolute;top:0;right:0;width:8px;height:8px;background:#F43F5E;border-radius:50%;border:1.5px solid #0F0A1A"></div>
+            </div>
             <div class="nav-item"><i class="ti ti-user-circle" aria-hidden="true"></i></div>
           </div>
         </div>
@@ -932,7 +935,239 @@
   </div>
 </div>
 
-<!-- ████ ROW 2: DESKTOP ████ -->
+<!-- ████ ROW 2: SEARCH/EXPLORE + CHAT ████ -->
+<div class="section-heading" style="margin-top:1rem">📱 Mobile — Explore &amp; Chat</div>
+<div class="device-row">
+
+  <!-- SEARCH / EXPLORE GRID -->
+  <div class="phone">
+    <div class="device-label">5. Search / Explore</div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div style="width:100%;height:100%;background:#0F0A1A;display:flex;flex-direction:column;overflow:hidden">
+          <!-- Search bar -->
+          <div style="padding:34px 12px 10px;background:#0F0A1A">
+            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:9px 14px;display:flex;align-items:center;gap:8px">
+              <i class="ti ti-search" style="font-size:15px;color:#6B5F82" aria-hidden="true"></i>
+              <span style="font-size:12px;color:#6B5F82">Cari pengguna, postingan, tagar...</span>
+            </div>
+          </div>
+          <!-- Explore grid 3 kolom -->
+          <div style="flex:1;overflow:hidden">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:0">
+              <!-- Kolom kiri besar -->
+              <div style="grid-row:span 2;background:linear-gradient(160deg,#1E0A2E,#2D1050);display:flex;align-items:center;justify-content:center;font-size:28px;aspect-ratio:1/2;position:relative">
+                🌅
+                <div style="position:absolute;bottom:5px;right:6px;background:rgba(0,0,0,0.5);border-radius:4px;padding:2px 4px;display:flex;align-items:center;gap:3px">
+                  <i class="ti ti-heart-filled" style="font-size:9px;color:#F43F5E" aria-hidden="true"></i>
+                  <span style="font-size:8px;color:#fff">1.2k</span>
+                </div>
+              </div>
+              <div style="background:linear-gradient(160deg,#0A1E2E,#102D30);display:flex;align-items:center;justify-content:center;font-size:22px;aspect-ratio:1/1;position:relative">
+                🍲
+                <div style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.5);border-radius:3px;padding:1px 3px"><i class="ti ti-player-play-filled" style="font-size:8px;color:#fff" aria-hidden="true"></i></div>
+              </div>
+              <div style="background:linear-gradient(160deg,#1E1A0A,#302810);display:flex;align-items:center;justify-content:center;font-size:22px;aspect-ratio:1/1">📸</div>
+              <div style="background:linear-gradient(160deg,#0A1E0E,#102D18);display:flex;align-items:center;justify-content:center;font-size:22px;aspect-ratio:1/1;position:relative">
+                🏝️
+                <div style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.5);border-radius:3px;padding:1px 3px"><i class="ti ti-player-play-filled" style="font-size:8px;color:#fff" aria-hidden="true"></i></div>
+              </div>
+              <!-- Baris bawah: 3 kotak normal -->
+              <div style="background:linear-gradient(160deg,#1E0A1A,#2D1030);display:flex;align-items:center;justify-content:center;font-size:22px;aspect-ratio:1/1">☕</div>
+              <div style="background:linear-gradient(160deg,#1A1E0A,#2D2810);display:flex;align-items:center;justify-content:center;font-size:22px;aspect-ratio:1/1;position:relative">
+                🌿
+                <div style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.5);border-radius:3px;padding:1px 3px"><i class="ti ti-player-play-filled" style="font-size:8px;color:#fff" aria-hidden="true"></i></div>
+              </div>
+              <div style="background:linear-gradient(160deg,#0A1A1E,#102430);display:flex;align-items:center;justify-content:center;font-size:22px;aspect-ratio:1/1">🎨</div>
+              <!-- Baris 3 -->
+              <div style="background:linear-gradient(160deg,#1E0A0A,#2D1010);display:flex;align-items:center;justify-content:center;font-size:22px;aspect-ratio:1/1">🌆</div>
+              <div style="background:linear-gradient(160deg,#0E0A1E,#181030);display:flex;align-items:center;justify-content:center;font-size:22px;aspect-ratio:1/1;position:relative">
+                🎵
+                <div style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.5);border-radius:3px;padding:1px 3px"><i class="ti ti-player-play-filled" style="font-size:8px;color:#fff" aria-hidden="true"></i></div>
+              </div>
+              <div style="background:linear-gradient(160deg,#0A1E14,#102D20);display:flex;align-items:center;justify-content:center;font-size:22px;aspect-ratio:1/1">🏔️</div>
+            </div>
+          </div>
+          <!-- Bottom Nav -->
+          <div class="home-nav">
+            <div class="nav-item"><i class="ti ti-home" aria-hidden="true"></i></div>
+            <div class="nav-item active"><i class="ti ti-search" aria-hidden="true"></i></div>
+            <div class="nav-create"><i class="ti ti-plus" aria-hidden="true"></i></div>
+            <div class="nav-item" style="position:relative">
+              <i class="ti ti-message-circle" aria-hidden="true"></i>
+              <div style="position:absolute;top:0;right:0;width:8px;height:8px;background:#F43F5E;border-radius:50%;border:1.5px solid #0F0A1A"></div>
+            </div>
+            <div class="nav-item"><i class="ti ti-user-circle" aria-hidden="true"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT LIST -->
+  <div class="phone">
+    <div class="device-label">6. Chat / DM — List</div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div style="width:100%;height:100%;background:#0F0A1A;display:flex;flex-direction:column;overflow:hidden">
+          <!-- AppBar -->
+          <div style="padding:36px 16px 12px;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;background:linear-gradient(90deg,#F43F5E,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Pesan</span>
+            <div style="width:32px;height:32px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center">
+              <i class="ti ti-edit" style="font-size:15px;color:#FAF8FF" aria-hidden="true"></i>
+            </div>
+          </div>
+          <!-- List percakapan -->
+          <div style="flex:1;overflow:hidden;padding:0 12px;display:flex;flex-direction:column;gap:0">
+            <!-- Item 1 (unread) -->
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+              <div style="position:relative">
+                <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#F43F5E,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white">SR</div>
+                <div style="position:absolute;bottom:0;right:0;width:12px;height:12px;background:#22C55E;border-radius:50%;border:2px solid #0F0A1A"></div>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:13px;font-weight:600;color:#FAF8FF">siti_rahma</span>
+                  <span style="font-size:10px;color:#6B5F82">20 mnt</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+                  <span style="font-size:11px;color:#6B5F82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px">Oke siap! Btw resep coto-nya...</span>
+                  <div style="width:16px;height:16px;background:#F43F5E;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span style="font-size:9px;color:white;font-weight:600">1</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Item 2 (unread) -->
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+              <div style="position:relative">
+                <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#F093FB,#F5576C);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white">FD</div>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:13px;font-weight:600;color:#FAF8FF">fitri_dewi</span>
+                  <span style="font-size:10px;color:#6B5F82">5 mnt</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+                  <span style="font-size:11px;color:#6B5F82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px">Kapan ke Pulau Samalona lagi?</span>
+                  <div style="width:16px;height:16px;background:#F43F5E;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span style="font-size:9px;color:white;font-weight:600">1</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Item 3 (read) -->
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+              <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#43E97B,#38F9D7);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#0F0A1A">MB</div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:13px;font-weight:500;color:#C4B5D4">maulana_b</span>
+                  <span style="font-size:10px;color:#6B5F82">Kemarin</span>
+                </div>
+                <span style="font-size:11px;color:#6B5F82">Pakai golden hour jam 5-6 sore...</span>
+              </div>
+            </div>
+            <!-- Item 4 (read) -->
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0">
+              <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#43E97B,#38F9D7);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#0F0A1A">RH</div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:13px;font-weight:500;color:#C4B5D4">reza_h</span>
+                  <span style="font-size:10px;color:#6B5F82">2 hari lalu</span>
+                </div>
+                <span style="font-size:11px;color:#6B5F82">Kopi Kulo, Jl. AP Pettarani ☕</span>
+              </div>
+            </div>
+          </div>
+          <!-- Bottom Nav -->
+          <div class="home-nav">
+            <div class="nav-item"><i class="ti ti-home" aria-hidden="true"></i></div>
+            <div class="nav-item"><i class="ti ti-search" aria-hidden="true"></i></div>
+            <div class="nav-create"><i class="ti ti-plus" aria-hidden="true"></i></div>
+            <div class="nav-item active" style="position:relative">
+              <i class="ti ti-message-circle" aria-hidden="true"></i>
+              <div style="position:absolute;top:0;right:0;width:8px;height:8px;background:#F43F5E;border-radius:50%;border:1.5px solid #0F0A1A"></div>
+            </div>
+            <div class="nav-item"><i class="ti ti-user-circle" aria-hidden="true"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT DETAIL -->
+  <div class="phone">
+    <div class="device-label">7. Chat — Percakapan</div>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div style="width:100%;height:100%;background:#0F0A1A;display:flex;flex-direction:column;overflow:hidden">
+          <!-- AppBar -->
+          <div style="padding:34px 12px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.05)">
+            <i class="ti ti-arrow-left" style="color:#FAF8FF;font-size:18px" aria-hidden="true"></i>
+            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F43F5E,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:white">SR</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#FAF8FF">siti_rahma</div>
+              <div style="font-size:10px;color:#22C55E">● Online</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:6px">
+              <i class="ti ti-dots-vertical" style="color:#6B5F82;font-size:18px" aria-hidden="true"></i>
+            </div>
+          </div>
+          <!-- Bubble chat -->
+          <div style="flex:1;overflow:hidden;padding:12px;display:flex;flex-direction:column;gap:8px;justify-content:flex-end">
+            <!-- Pesan masuk -->
+            <div style="display:flex;gap:7px;align-items:flex-end">
+              <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#F43F5E,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:white;flex-shrink:0">SR</div>
+              <div>
+                <div style="background:#22163A;border:1px solid rgba(255,255,255,0.06);border-radius:14px 14px 14px 4px;padding:8px 12px;max-width:180px">
+                  <span style="font-size:11px;color:#C4B5D4">Hei! Sunset di Losari kemarin keren banget 😍</span>
+                </div>
+                <span style="font-size:9px;color:#6B5F82;margin-top:2px;display:block">21:10</span>
+              </div>
+            </div>
+            <!-- Pesan keluar -->
+            <div style="display:flex;justify-content:flex-end">
+              <div>
+                <div style="background:linear-gradient(135deg,#F43F5E,#8B5CF6);border-radius:14px 14px 4px 14px;padding:8px 12px;max-width:180px">
+                  <span style="font-size:11px;color:white">Makasih! Datang aja sendiri, tiap sore bagus 🌅</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:2px">
+                  <span style="font-size:9px;color:#6B5F82">21:12</span>
+                  <i class="ti ti-checks" style="font-size:10px;color:#8B5CF6" aria-hidden="true"></i>
+                </div>
+              </div>
+            </div>
+            <!-- Pesan masuk (unread) -->
+            <div style="display:flex;gap:7px;align-items:flex-end">
+              <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#F43F5E,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:white;flex-shrink:0">SR</div>
+              <div>
+                <div style="background:#22163A;border:1px solid rgba(255,255,255,0.06);border-radius:14px 14px 14px 4px;padding:8px 12px;max-width:180px">
+                  <span style="font-size:11px;color:#C4B5D4">Oke siap! Btw resep coto-nya mau dishare ga? 🍲</span>
+                </div>
+                <span style="font-size:9px;color:#6B5F82;margin-top:2px;display:block">21:42</span>
+              </div>
+            </div>
+          </div>
+          <!-- Input field -->
+          <div style="padding:8px 10px 20px;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:8px">
+            <div style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:8px 14px">
+              <span style="font-size:11px;color:#6B5F82">Tulis pesan...</span>
+            </div>
+            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F43F5E,#8B5CF6);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="ti ti-send" style="font-size:15px;color:white" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ████ ROW 3: DESKTOP ████ -->
 <div class="section-heading" style="margin-top:1rem">🖥️ Desktop — Home Feed</div>
 <div class="desktop-wrap">
   <div class="desktop-bar">
@@ -955,8 +1190,9 @@
         </div>
         <div class="desk-nav-item"><i class="ti ti-search" aria-hidden="true"></i> Cari</div>
         <div class="desk-nav-item"><i class="ti ti-compass" aria-hidden="true"></i> Eksplorasi</div>
-        <div class="desk-nav-item"><i class="ti ti-bell" aria-hidden="true"></i> Notifikasi</div>
-        <div class="desk-nav-item"><i class="ti ti-message-circle" aria-hidden="true"></i> Pesan</div>
+        <div class="desk-nav-item" style="position:relative"><i class="ti ti-message-circle" aria-hidden="true"></i> Pesan
+          <div style="position:absolute;top:8px;right:10px;width:7px;height:7px;background:#F43F5E;border-radius:50%"></div>
+        </div>
         <div class="desk-nav-item"><i class="ti ti-bookmark" aria-hidden="true"></i> Tersimpan</div>
         <div class="desk-nav-item"><i class="ti ti-user-circle" aria-hidden="true"></i> Profil</div>
         <div class="desk-nav-item" style="margin-top:auto"><i class="ti ti-settings" aria-hidden="true"></i> Pengaturan</div>

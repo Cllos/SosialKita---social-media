@@ -6,6 +6,7 @@ import '../../providers/post_provider.dart';
 import '../../widgets/post/post_card.dart';
 import '../../widgets/story/story_row.dart';
 import '../profile/mobile_profile.dart';
+import '../search/search_screen.dart';
 
 /// MobileHome — Layout mobile dengan BottomNavigationBar
 /// Menampilkan topbar, stories, feed, dan bottom nav
@@ -32,8 +33,8 @@ class _MobileHomeState extends State<MobileHome> {
           children: [
             // 0 — Home Feed
             _buildHomeFeed(context),
-            // 1 — Search (placeholder)
-            _buildPlaceholder('Cari', Icons.search_rounded),
+            // 1 — Search
+            const SearchScreen(),
             // 2 — Create Post (placeholder, handled by FAB)
             _buildPlaceholder('Buat Postingan', Icons.add_circle_outline),
             // 3 — Notifications (placeholder)

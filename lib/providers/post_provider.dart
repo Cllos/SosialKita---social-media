@@ -94,4 +94,17 @@ class PostProvider extends ChangeNotifier {
   int getCommentCount(String postId) {
     return dummyComments.where((c) => c.postId == postId).length;
   }
+
+  /// Pencarian postingan berdasarkan caption / hashtag
+  List<PostModel> searchPosts(String query) {
+    if (query.isEmpty) return [];
+    final q = query.toLowerCase();
+    return _posts
+        .where((p) =>
+            p.caption.toLowerCase().contains(q) ||
+            p.tags.any((t) => t.toLowerCase().contains(q)) ||
+            p.location.toLowerCase().contains(q))
+        .toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
 }

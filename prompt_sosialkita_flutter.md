@@ -91,7 +91,8 @@ lib/
 │   ├── auth_provider.dart          # currentUser, login, logout, register
 │   ├── post_provider.dart          # feed, like, save, upload
 │   ├── user_provider.dart          # follow, unfollow, search users
-│   └── comment_provider.dart       # komentar per post
+│   ├── comment_provider.dart       # komentar per post
+│   └── chat_provider.dart          # DM conversations, send, read
 ├── screens/
 │   ├── splash/
 │   │   └── splash_screen.dart
@@ -110,7 +111,10 @@ lib/
 │   │   ├── create_post_screen.dart # Upload gambar + caption
 │   │   └── post_detail_screen.dart # Detail post + komentar
 │   ├── search/
-│   │   └── search_screen.dart      # Search user + post
+│   │   └── search_screen.dart      # Explore grid + search user/post
+│   ├── chat/
+│   │   ├── chat_list_screen.dart   # Daftar percakapan DM
+│   │   └── chat_detail_screen.dart # Percakapan 1-on-1
 │   ├── profile/
 │   │   ├── profile_screen.dart     # Profil sendiri
 │   │   └── other_profile_screen.dart # Profil user lain
@@ -181,6 +185,31 @@ class CommentModel {
   final String userId;
   final String text;
   final DateTime createdAt;
+}
+```
+
+### `dm_message_model.dart` *(baru)*
+```dart
+class DmMessageModel {
+  final String id;
+  final String fromUserId;
+  final String toUserId;
+  final String text;
+  final bool isRead;
+  final DateTime createdAt;
+}
+
+class DmConversation {
+  final String id;               // gabungan userId dua pihak, misal "u1_u2"
+  final List<String> participantIds;
+  final List<DmMessageModel> messages;
+  DateTime get lastMessageTime => messages.isNotEmpty
+      ? messages.last.createdAt
+      : DateTime(2024);
+  DmMessageModel? get lastMessage =>
+      messages.isNotEmpty ? messages.last : null;
+  int unreadCount(String myId) =>
+      messages.where((m) => m.toUserId == myId && !m.isRead).length;
 }
 ```
 
@@ -389,6 +418,60 @@ final List<CommentModel> dummyComments = [
 ];
 ```
 
+### DM Conversations (minimal 4 percakapan)
+```dart
+final List<DmConversation> dummyConversations = [
+  DmConversation(
+    id: 'u1_u2',
+    participantIds: ['u1', 'u2'],
+    messages: [
+      DmMessageModel(id: 'dm1', fromUserId: 'u2', toUserId: 'u1',
+          text: 'Hei! Sunset di Losari kemarin keren banget 😍',
+          isRead: true, createdAt: DateTime.now().subtract(Duration(hours: 3))),
+      DmMessageModel(id: 'dm2', fromUserId: 'u1', toUserId: 'u2',
+          text: 'Makasih! Datang aja sendiri, tiap sore bagus',
+          isRead: true, createdAt: DateTime.now().subtract(Duration(hours: 2, minutes: 50))),
+      DmMessageModel(id: 'dm3', fromUserId: 'u2', toUserId: 'u1',
+          text: 'Oke siap! Btw resep coto-nya mau dishare ga? 🍲',
+          isRead: false, createdAt: DateTime.now().subtract(Duration(minutes: 20))),
+    ],
+  ),
+  DmConversation(
+    id: 'u1_u3',
+    participantIds: ['u1', 'u3'],
+    messages: [
+      DmMessageModel(id: 'dm4', fromUserId: 'u3', toUserId: 'u1',
+          text: 'Bro, mau minta tips foto sunset dong 📸',
+          isRead: true, createdAt: DateTime.now().subtract(Duration(days: 1))),
+      DmMessageModel(id: 'dm5', fromUserId: 'u1', toUserId: 'u3',
+          text: 'Pakai golden hour jam 5-6 sore, settingan manual ISO 100',
+          isRead: true, createdAt: DateTime.now().subtract(Duration(hours: 23))),
+    ],
+  ),
+  DmConversation(
+    id: 'u1_u4',
+    participantIds: ['u1', 'u4'],
+    messages: [
+      DmMessageModel(id: 'dm6', fromUserId: 'u4', toUserId: 'u1',
+          text: 'Kapan ke Pulau Samalona lagi? Ikut dong!',
+          isRead: false, createdAt: DateTime.now().subtract(Duration(minutes: 5))),
+    ],
+  ),
+  DmConversation(
+    id: 'u1_u5',
+    participantIds: ['u1', 'u5'],
+    messages: [
+      DmMessageModel(id: 'dm7', fromUserId: 'u1', toUserId: 'u5',
+          text: 'Reza, café kopi toraja-nya di mana tuh?',
+          isRead: true, createdAt: DateTime.now().subtract(Duration(days: 2))),
+      DmMessageModel(id: 'dm8', fromUserId: 'u5', toUserId: 'u1',
+          text: 'Kopi Kulo, Jl. AP Pettarani. Recommended banget ☕',
+          isRead: true, createdAt: DateTime.now().subtract(Duration(days: 1, hours: 22))),
+    ],
+  ),
+];
+```
+
 ---
 
 ## FITUR YANG HARUS DIIMPLEMENTASI
@@ -452,7 +535,7 @@ class ResponsiveLayout extends StatelessWidget {
 ```
 
 **Mobile Layout:** `BottomNavigationBar` dengan 5 tab:
-- Home (feed), Search, Buat Post (+), Notifikasi, Profil
+- Home (feed), Search/Explore, Buat Post (+), Chat/DM, Profil
 
 **Desktop Layout:** Sidebar kiri (navigasi) + konten tengah (feed) + panel kanan (saran follow, trending tag)
 
@@ -488,7 +571,7 @@ Setiap `PostCard` menampilkan:
 
 **CreatePostScreen:**
 - Pilih gambar dari galeri menggunakan package `image_picker`
-- Jika platform tidak support (web limitation) → tampilkan field URL gambar sebagai fallback
+  - Jika platform tidak support (web limitation) → tampilkan field URL gambar sebagai fallback
 - Input caption (multiline, max 500 karakter, tampilkan counter)
 - Input lokasi (opsional)
 - Input hashtag (opsional, parse otomatis dari caption jika ada #)
@@ -544,21 +627,104 @@ Setiap `PostCard` menampilkan:
 
 ---
 
-### 9. SEARCH USER/POST
+### 9. SEARCH / EXPLORE (tampilan grid ala TikTok/Instagram Explore)
 
-**SearchScreen:**
-- SearchBar di atas (focus otomatis saat halaman dibuka)
-- Default (sebelum mengetik): tampilkan "Trending Tags" (#Makassar, #Sulsel, dll) + "User Disarankan"
-- Saat mengetik: filter real-time
-  - Tab "Pengguna": cari berdasarkan username / displayName (case-insensitive)
-  - Tab "Postingan": cari berdasarkan caption / hashtag
-- Tap hasil user → navigasi ke OtherProfileScreen
-- Tap hasil post → navigasi ke PostDetailScreen
-- Jika tidak ada hasil → tampilkan ilustrasi kosong + teks "Tidak ada hasil untuk '...'"
+**SearchScreen — dua mode tampilan:**
+
+**Mode Default (belum mengetik) = Explore Grid:**
+- SearchBar di paling atas dengan hint "Cari pengguna, postingan, tagar..."
+- Di bawah search bar: **grid 3 kolom** berisi thumbnail semua postingan dari `dummyPosts`
+- Setiap thumbnail berukuran sama (aspek rasio 1:1, atau bervariasi seperti Pinterest — 1 item besar di kolom kiri, 2 item kecil di kolom kanan, bergantian)
+- Di pojok kanan bawah thumbnail: tampilkan ikon ▶️ jika ada video (untuk versi dummy cukup tampilkan ikon play di atas gambar)
+- Tap thumbnail → navigasi ke `PostDetailScreen`
+- Grid menggunakan `GridView.builder` dengan `SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, mainAxisSpacing: 2, crossAxisSpacing: 2)`
+- Tidak ada label/teks di bawah thumbnail, murni visual seperti referensi gambar 2
+
+**Mode Aktif (sedang mengetik) = Hasil Pencarian:**
+- Tampilan berubah dari grid → list hasil pencarian
+- Tampilkan 2 tab: **Pengguna** | **Postingan**
+- Tab Pengguna: list avatar + username + displayName + tombol Follow/Unfollow
+- Tab Postingan: list mini card (thumbnail kecil + caption + username)
+- Filter real-time: cari berdasarkan username / displayName / caption / hashtag (case-insensitive)
+- Tap hasil user → navigasi ke `OtherProfileScreen`
+- Tap hasil post → navigasi ke `PostDetailScreen`
+- Jika tidak ada hasil → ilustrasi kosong + teks "Tidak ada hasil untuk '...'"
+- Tap X di search bar → kembali ke mode Explore Grid
+
+**Transisi antar mode:**
+```dart
+// Gunakan AnimatedSwitcher untuk transisi halus antara grid dan list
+AnimatedSwitcher(
+  duration: Duration(milliseconds: 250),
+  child: _isSearching ? _buildSearchResults() : _buildExploreGrid(),
+)
+```
 
 ---
 
-### 10. SIMPAN POSTINGAN
+### 10. CHAT / DIRECT MESSAGE (DM)
+
+**ChatListScreen (daftar percakapan):**
+- AppBar: judul "Pesan" + ikon pensil (buat DM baru)
+- List percakapan diurut dari yang paling baru
+- Setiap item percakapan menampilkan:
+  - Avatar lawan bicara (dengan gradient ring jika ada pesan belum dibaca)
+  - Nama + username lawan bicara
+  - Preview pesan terakhir (truncate jika panjang)
+  - Waktu pesan terakhir (format: "5 mnt", "2 jam", "Kemarin")
+  - Badge bulat merah dengan angka jika ada pesan belum dibaca (`unreadCount > 0`)
+- Tap item → navigasi ke `ChatDetailScreen`
+- Ikon pensil di AppBar → tampilkan bottom sheet daftar user yang bisa di-DM (dari following list)
+- Jika belum ada percakapan → tampilkan ilustrasi kosong + "Belum ada pesan"
+
+**ChatDetailScreen (percakapan 1-on-1):**
+- AppBar: avatar + nama lawan bicara (tap → OtherProfileScreen)
+- `ListView` bubble chat dari atas ke bawah, scroll ke pesan terbaru otomatis
+- Bubble pesan sendiri (kanan, warna rose/violet), bubble lawan bicara (kiri, warna card)
+- Format waktu di bawah setiap bubble: "14:32"
+- Input field di bawah: text field + tombol kirim (gradient)
+- Kirim pesan → tambahkan `DmMessageModel` baru ke `DmConversation` di `ChatProvider`
+- Semua pesan dari lawan bicara otomatis ditandai `isRead: true` saat buka screen ini
+- Keyboard-aware: gunakan `resizeToAvoidBottomInset: true`
+
+**ChatProvider:**
+```dart
+class ChatProvider extends ChangeNotifier {
+  List<DmConversation> _conversations = List.from(dummyConversations);
+
+  List<DmConversation> getConversationsForUser(String userId) {
+    return _conversations
+        .where((c) => c.participantIds.contains(userId))
+        .toList()
+        ..sort((a, b) => b.lastMessageTime.compareTo(a.lastMessageTime));
+  }
+
+  DmConversation? getConversation(String userId1, String userId2) { ... }
+
+  void sendMessage(String fromId, String toId, String text) {
+    // Cari atau buat conversation baru, tambahkan pesan
+    notifyListeners();
+  }
+
+  void markAsRead(String conversationId, String myId) {
+    // Set isRead = true untuk semua pesan dengan toUserId == myId
+    notifyListeners();
+  }
+
+  int totalUnread(String myId) {
+    return _conversations
+        .fold(0, (sum, c) => sum + c.unreadCount(myId));
+  }
+}
+```
+
+**Badge unread di bottom nav:**
+- Jika `totalUnread > 0` → tampilkan badge merah kecil di atas ikon Chat di bottom nav
+- Gunakan `Stack` + `Positioned` untuk badge di atas icon
+
+---
+
+### 11. SIMPAN POSTINGAN
 
 - Method `toggleSave(String postId, String userId)` di `PostProvider`
 - Update `currentUser.savedPosts` di `AuthProvider`
@@ -567,7 +733,7 @@ Setiap `PostCard` menampilkan:
 
 ---
 
-### 11. LOGOUT
+### 12. LOGOUT
 
 - Tombol logout di ProfileScreen (pojok kanan atas atau di pengaturan)
 - Tampilkan dialog konfirmasi: "Yakin ingin keluar?" + tombol Batal / Keluar
@@ -576,7 +742,7 @@ Setiap `PostCard` menampilkan:
 
 ---
 
-### 12. ROLE: MODERATOR
+### 13. ROLE: MODERATOR
 
 **ModeratorDashboard** (hanya bisa diakses jika role = 'moderator'):
 - Tampilkan semua post (bukan hanya following)
@@ -592,18 +758,20 @@ Setiap `PostCard` menampilkan:
 ```dart
 // routes.dart
 class AppRoutes {
-  static const splash      = '/';
-  static const onboarding  = '/onboarding';
-  static const login       = '/login';
-  static const register    = '/register';
-  static const home        = '/home';
-  static const createPost  = '/create-post';
-  static const postDetail  = '/post-detail';
-  static const profile     = '/profile';
+  static const splash       = '/';
+  static const onboarding   = '/onboarding';
+  static const login        = '/login';
+  static const register     = '/register';
+  static const home         = '/home';
+  static const createPost   = '/create-post';
+  static const postDetail   = '/post-detail';
+  static const profile      = '/profile';
   static const otherProfile = '/other-profile';
-  static const search      = '/search';
-  static const saved       = '/saved';
-  static const moderator   = '/moderator';
+  static const search       = '/search';
+  static const saved        = '/saved';
+  static const chatList     = '/chat';
+  static const chatDetail   = '/chat-detail';
+  static const moderator    = '/moderator';
 }
 ```
 
@@ -821,13 +989,15 @@ class SKTextField extends StatelessWidget {
 | 3 | Login | `/login` | Form login |
 | 4 | Register | `/register` | Form register |
 | 5 | Home Feed | `/home` | Feed + stories |
-| 6 | Create Post | `/create-post` | Upload + caption |
-| 7 | Post Detail | `/post-detail` | Detail + komentar |
-| 8 | Search | `/search` | Cari user/post |
-| 9 | Profile | `/profile` | Profil sendiri |
-| 10 | Profil Lain | `/other-profile` | Profil user lain |
-| 11 | Saved | `/saved` | Postingan tersimpan |
-| 12 | Moderator | `/moderator` | Dashboard moderator |
+| 6 | Search/Explore | `/search` | Grid explore + pencarian |
+| 7 | Create Post | `/create-post` | Upload + caption |
+| 8 | Post Detail | `/post-detail` | Detail + komentar |
+| 9 | Chat List | `/chat` | Daftar percakapan DM |
+| 10 | Chat Detail | `/chat-detail` | Percakapan 1-on-1 |
+| 11 | Profile | `/profile` | Profil sendiri |
+| 12 | Profil Lain | `/other-profile` | Profil user lain |
+| 13 | Saved | `/saved` | Postingan tersimpan |
+| 14 | Moderator | `/moderator` | Dashboard moderator |
 
 ---
 
