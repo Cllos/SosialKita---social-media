@@ -13,6 +13,7 @@ class SKTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final VoidCallback? onSuffixTap;
   final TextInputType? keyboardType;
+  final ValueChanged<String>? onChanged;
 
   const SKTextField({
     super.key,
@@ -25,6 +26,7 @@ class SKTextField extends StatelessWidget {
     this.validator,
     this.onSuffixTap,
     this.keyboardType,
+    this.onChanged,
   });
 
   @override
@@ -48,6 +50,7 @@ class SKTextField extends StatelessWidget {
           obscureText: obscureText,
           validator: validator,
           keyboardType: keyboardType,
+          onChanged: onChanged,
           style: const TextStyle(
             fontFamily: 'DM Sans',
             color: AppColors.skWhite,
