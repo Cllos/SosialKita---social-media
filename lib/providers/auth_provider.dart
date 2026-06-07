@@ -111,4 +111,29 @@ class AuthProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  /// Menambah/menghapus postingan dari daftar disimpan
+  void toggleSavePost(String postId) {
+    if (_currentUser == null) return;
+
+    final saved = List<String>.from(_currentUser!.savedPosts);
+    if (saved.contains(postId)) {
+      saved.remove(postId);
+    } else {
+      saved.add(postId);
+    }
+
+    _currentUser = _currentUser!.copyWith(savedPosts: saved);
+    final idx = dummyUsers.indexWhere((u) => u.id == _currentUser!.id);
+    if (idx != -1) {
+      dummyUsers[idx] = _currentUser!;
+    }
+    notifyListeners();
+  }
+
+  /// Cek apakah postingan sudah disimpan
+  bool isSaved(String postId) {
+    if (_currentUser == null) return false;
+    return _currentUser!.savedPosts.contains(postId);
+  }
 }

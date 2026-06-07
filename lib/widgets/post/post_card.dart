@@ -7,7 +7,10 @@ import '../../models/post_model.dart';
 import '../../models/user_model.dart';
 import '../../providers/post_provider.dart';
 import '../../providers/comment_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../screens/profile/other_profile_screen.dart';
+import '../../screens/post/comment_sheet.dart';
+import '../../screens/post/share_sheet.dart';
 import '../common/sk_avatar.dart';
 
 /// PostCard — Card postingan di feed
@@ -89,6 +92,7 @@ class _PostCardState extends State<PostCard>
         final post = postProvider.getPostById(widget.post.id) ?? widget.post;
         final isLiked = postProvider.isLiked(post.id, widget.currentUserId);
         final commentCount = commentProvider.commentCount(post.id);
+        final isSaved = context.watch<AuthProvider>().isSaved(post.id);
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -117,7 +121,7 @@ class _PostCardState extends State<PostCard>
               const SizedBox(height: 10),
 
               // ── Aksi ──
-              _buildActions(post, isLiked, commentCount),
+              _buildActions(post, isLiked, commentCount, isSaved),
             ],
           ),
         );
@@ -322,7 +326,7 @@ class _PostCardState extends State<PostCard>
     return spans;
   }
 
-  Widget _buildActions(PostModel post, bool isLiked, int commentCount) {
+  Widget _buildActions(PostModel post, bool isLiked, int commentCount, bool isSaved) {
     return Row(
       children: [
         // Like
@@ -339,9 +343,7 @@ class _PostCardState extends State<PostCard>
           icon: Icons.chat_bubble_outline,
           label: commentCount > 0 ? '$commentCount' : '',
           color: AppColors.skMuted,
-          onTap: () {
-            // TODO: Navigasi ke PostDetailScreen
-          },
+          onTap: () => _showCommentsBottomSheet(context, post.id),
         ),
         const SizedBox(width: 14),
 
@@ -350,20 +352,21 @@ class _PostCardState extends State<PostCard>
           icon: Icons.send_outlined,
           label: '',
           color: AppColors.skMuted,
-          onTap: () {},
+          onTap: () => _showShareBottomSheet(context, post),
         ),
 
         const Spacer(),
 
         // Bookmark
         _ActionButton(
-          icon: Icons.bookmark_border,
+          icon: isSaved ? Icons.bookmark : Icons.bookmark_border,
           label: '',
-          color: AppColors.skMuted,
+          color: isSaved ? AppColors.skRose : AppColors.skMuted,
           onTap: () {
+            context.read<AuthProvider>().toggleSavePost(post.id);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('Postingan disimpan'),
+                content: Text(isSaved ? 'Dihapus dari postingan disimpan' : 'Postingan disimpan'),
                 backgroundColor: AppColors.skCard,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
@@ -375,6 +378,30 @@ class _PostCardState extends State<PostCard>
           },
         ),
       ],
+    );
+  }
+
+  void _showCommentsBottomSheet(BuildContext context, String postId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.75, // 75% dari tinggi layar
+          child: CommentSheet(postId: postId),
+        );
+      },
+    );
+  }
+
+  void _showShareBottomSheet(BuildContext context, PostModel post) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return ShareSheet(post: post);
+      },
     );
   }
 }

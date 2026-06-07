@@ -7,6 +7,12 @@ import '../../widgets/post/post_card.dart';
 import '../../widgets/story/story_row.dart';
 import '../profile/mobile_profile.dart';
 import '../search/search_screen.dart';
+import '../post/create_post_screen.dart';
+import '../chat/chat_list_screen.dart';
+import '../../providers/chat_provider.dart';
+import '../post/saved_posts_screen.dart';
+import '../notification/notification_screen.dart';
+import '../../providers/notification_provider.dart';
 
 /// MobileHome — Layout mobile dengan BottomNavigationBar
 /// Menampilkan topbar, stories, feed, dan bottom nav
@@ -37,8 +43,8 @@ class _MobileHomeState extends State<MobileHome> {
             const SearchScreen(),
             // 2 — Create Post (placeholder, handled by FAB)
             _buildPlaceholder('Buat Postingan', Icons.add_circle_outline),
-            // 3 — Notifications (placeholder)
-            _buildPlaceholder('Notifikasi', Icons.notifications_outlined),
+            // 3 — Chat/DM Screen
+            const ChatListScreen(),
             // 4 — Profile
             const MobileProfile(),
           ],
@@ -130,6 +136,9 @@ class _MobileHomeState extends State<MobileHome> {
   }
 
   Widget _buildTopBar(BuildContext context) {
+    final notificationProvider = context.watch<NotificationProvider>();
+    final hasUnreadNotifications = notificationProvider.unreadCount > 0;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Row(
@@ -154,16 +163,30 @@ class _MobileHomeState extends State<MobileHome> {
           // Notification button
           _TopBarButton(
             icon: Icons.notifications_outlined,
-            showDot: true,
-            onTap: () {},
+            showDot: hasUnreadNotifications,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const NotificationScreen(),
+                ),
+              );
+            },
           ),
           const SizedBox(width: 6),
 
-          // Message button
+          // Saved posts button
           _TopBarButton(
-            icon: Icons.chat_bubble_outline,
+            icon: Icons.bookmark_border,
             showDot: false,
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const SavedPostsScreen(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -171,6 +194,10 @@ class _MobileHomeState extends State<MobileHome> {
   }
 
   Widget _buildBottomNav() {
+    final currentUser = context.watch<AuthProvider>().currentUser;
+    final hasUnread = currentUser != null &&
+        context.watch<ChatProvider>().getTotalUnreadCount(currentUser.id) > 0;
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.skDark.withOpacity(0.95),
@@ -199,14 +226,10 @@ class _MobileHomeState extends State<MobileHome> {
           // Create (gradient button)
           GestureDetector(
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Buat Postingan — segera hadir'),
-                  backgroundColor: AppColors.skCard,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const CreatePostScreen(),
                 ),
               );
             },
@@ -227,10 +250,11 @@ class _MobileHomeState extends State<MobileHome> {
               child: const Icon(Icons.add, color: Colors.white, size: 24),
             ),
           ),
-          // Notifications
+          // Chat / DM
           _BottomNavItem(
-            icon: Icons.favorite_border,
+            icon: Icons.chat_bubble_outline,
             isActive: _currentIndex == 3,
+            showDot: hasUnread,
             onTap: () => setState(() => _currentIndex = 3),
           ),
           // Profile
@@ -332,11 +356,13 @@ class _TopBarButton extends StatelessWidget {
 class _BottomNavItem extends StatelessWidget {
   final IconData icon;
   final bool isActive;
+  final bool showDot;
   final VoidCallback onTap;
 
   const _BottomNavItem({
     required this.icon,
     required this.isActive,
+    this.showDot = false,
     required this.onTap,
   });
 
@@ -344,10 +370,32 @@ class _BottomNavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Icon(
-        icon,
-        size: 26,
-        color: isActive ? AppColors.skRose : AppColors.skMuted,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Icon(
+            icon,
+            size: 26,
+            color: isActive ? AppColors.skRose : AppColors.skMuted,
+          ),
+          if (showDot)
+            Positioned(
+              top: -2,
+              right: -2,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: AppColors.skRose,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.skDark,
+                    width: 1.5,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../screens/post/create_post_screen.dart';
 
 /// DesktopSidebar — Navigasi sidebar kiri untuk layout desktop
 /// Sesuai design sosialkita_ui.html (.desk-sidebar)
@@ -67,28 +68,22 @@ class DesktopSidebar extends StatelessWidget {
             onTap: () => onItemTap(2),
           ),
           _NavItem(
-            icon: Icons.notifications_outlined,
-            label: 'Notifikasi',
+            icon: Icons.chat_bubble_outline,
+            label: 'Pesan',
             isActive: selectedIndex == 3,
             onTap: () => onItemTap(3),
           ),
           _NavItem(
-            icon: Icons.chat_bubble_outline,
-            label: 'Pesan',
+            icon: Icons.bookmark_border,
+            label: 'Tersimpan',
             isActive: selectedIndex == 4,
             onTap: () => onItemTap(4),
           ),
           _NavItem(
-            icon: Icons.bookmark_border,
-            label: 'Tersimpan',
-            isActive: selectedIndex == 5,
-            onTap: () => onItemTap(5),
-          ),
-          _NavItem(
             icon: Icons.person_outline,
             label: 'Profil',
-            isActive: selectedIndex == 6,
-            onTap: () => onItemTap(6),
+            isActive: selectedIndex == 5,
+            onTap: () => onItemTap(5),
           ),
 
           const Spacer(),
@@ -105,7 +100,12 @@ class DesktopSidebar extends StatelessWidget {
           // ── Buat Postingan ──
           GestureDetector(
             onTap: () {
-              // TODO: Navigasi ke CreatePostScreen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const CreatePostScreen(),
+                ),
+              );
             },
             child: Container(
               width: double.infinity,

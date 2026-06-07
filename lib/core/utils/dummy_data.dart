@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/user_model.dart';
 import '../../models/post_model.dart';
 import '../../models/comment_model.dart';
+import '../../models/dm_message_model.dart';
 
 // ══════════════════════════════════════
 //  DATA DUMMY — USERS
@@ -431,5 +432,102 @@ final List<CommentModel> dummyComments = [
     userId: 'u6',
     text: 'Bucket list aku ini! Cerita lengkapnya dong kak',
     createdAt: DateTime.now().subtract(const Duration(days: 4, hours: 20)),
+  ),
+];
+
+// ══════════════════════════════════════
+//  DATA DUMMY — DM CONVERSATIONS
+// ══════════════════════════════════════
+
+final List<DmConversation> dummyConversations = [
+  DmConversation(
+    id: 'u1_u2',
+    participantIds: ['u1', 'u2'],
+    messages: [
+      DmMessageModel(
+        id: 'dm1',
+        fromUserId: 'u2',
+        toUserId: 'u1',
+        text: 'Hei! Sunset di Losari kemarin keren banget 😍',
+        isRead: true,
+        createdAt: DateTime.now().subtract(const Duration(hours: 3)),
+      ),
+      DmMessageModel(
+        id: 'dm2',
+        fromUserId: 'u1',
+        toUserId: 'u2',
+        text: 'Makasih! Datang aja sendiri, tiap sore bagus',
+        isRead: true,
+        createdAt:
+            DateTime.now().subtract(const Duration(hours: 2, minutes: 50)),
+      ),
+      DmMessageModel(
+        id: 'dm3',
+        fromUserId: 'u2',
+        toUserId: 'u1',
+        text: 'Oke siap! Btw resep coto-nya mau dishare ga? 🍲',
+        isRead: false,
+        createdAt: DateTime.now().subtract(const Duration(minutes: 20)),
+      ),
+    ],
+  ),
+  DmConversation(
+    id: 'u1_u3',
+    participantIds: ['u1', 'u3'],
+    messages: [
+      DmMessageModel(
+        id: 'dm4',
+        fromUserId: 'u3',
+        toUserId: 'u1',
+        text: 'Bro, mau minta tips foto sunset dong 📸',
+        isRead: true,
+        createdAt: DateTime.now().subtract(const Duration(days: 1)),
+      ),
+      DmMessageModel(
+        id: 'dm5',
+        fromUserId: 'u1',
+        toUserId: 'u3',
+        text: 'Pakai golden hour jam 5-6 sore, settingan manual ISO 100',
+        isRead: true,
+        createdAt: DateTime.now().subtract(const Duration(hours: 23)),
+      ),
+    ],
+  ),
+  DmConversation(
+    id: 'u1_u4',
+    participantIds: ['u1', 'u4'],
+    messages: [
+      DmMessageModel(
+        id: 'dm6',
+        fromUserId: 'u4',
+        toUserId: 'u1',
+        text: 'Kapan ke Pulau Samalona lagi? Ikut dong!',
+        isRead: false,
+        createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
+      ),
+    ],
+  ),
+  DmConversation(
+    id: 'u1_u5',
+    participantIds: ['u1', 'u5'],
+    messages: [
+      DmMessageModel(
+        id: 'dm7',
+        fromUserId: 'u1',
+        toUserId: 'u5',
+        text: 'Reza, café kopi toraja-nya di mana tuh?',
+        isRead: true,
+        createdAt: DateTime.now().subtract(const Duration(days: 2)),
+      ),
+      DmMessageModel(
+        id: 'dm8',
+        fromUserId: 'u5',
+        toUserId: 'u1',
+        text: 'Kopi Kulo, Jl. AP Pettarani. Recommended banget ☕',
+        isRead: true,
+        createdAt:
+            DateTime.now().subtract(const Duration(days: 1, hours: 22)),
+      ),
+    ],
   ),
 ];

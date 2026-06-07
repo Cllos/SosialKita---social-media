@@ -5,6 +5,8 @@ import 'providers/auth_provider.dart';
 import 'providers/post_provider.dart';
 import 'providers/comment_provider.dart';
 import 'providers/user_provider.dart';
+import 'providers/chat_provider.dart';
+import 'providers/notification_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 
@@ -23,6 +25,8 @@ class SosialKitaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PostProvider()),
         ChangeNotifierProvider(create: (_) => CommentProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: MaterialApp(
         title: 'SosialKita',
