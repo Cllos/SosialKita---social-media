@@ -9,6 +9,7 @@ import '../../providers/user_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
 import '../../widgets/layout/desktop_sidebar.dart';
 import 'edit_profile_sheet.dart';
+import '../post/post_detail_screen.dart';
 
 /// DesktopProfile — Halaman profil pengguna (desktop layout)
 /// Menampilkan sidebar kiri + konten profil di tengah
@@ -572,7 +573,12 @@ class _DesktopPostGridTileState extends State<_DesktopPostGridTile> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: () {
-          // TODO: Navigasi ke PostDetailScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PostDetailScreen(postId: widget.post.id),
+            ),
+          );
         },
         child: Stack(
           fit: StackFit.expand,

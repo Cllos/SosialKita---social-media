@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/sk_button.dart';
 import '../../widgets/common/sk_text_field.dart';
+import 'register_screen.dart';
 
 /// Login Screen — SosialKita
 /// Sesuai design dari sosialkita_ui.html (section LOGIN)
@@ -130,15 +131,10 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _handleNavigateToRegister() {
-    // TODO: Navigator.pushNamed(context, '/register');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Halaman Register belum tersedia'),
-        backgroundColor: AppColors.skCard,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const RegisterScreen(),
       ),
     );
   }

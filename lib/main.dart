@@ -9,6 +9,7 @@ import 'providers/chat_provider.dart';
 import 'providers/notification_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/moderator/moderator_dashboard.dart';
 
 void main() {
   runApp(const SosialKitaApp());
@@ -34,8 +35,11 @@ class SosialKitaApp extends StatelessWidget {
         theme: buildAppTheme(),
         home: Consumer<AuthProvider>(
           builder: (context, auth, _) {
-            // Jika sudah login → ke HomeScreen, belum → ke LoginScreen
+            // Jika sudah login → ke HomeScreen (atau ModeratorDashboard jika Moderator), belum → ke LoginScreen
             if (auth.isLoggedIn) {
+              if (auth.isModerator) {
+                return const ModeratorDashboard();
+              }
               return const HomeScreen();
             }
             return const LoginScreen();

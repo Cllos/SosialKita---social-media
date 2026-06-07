@@ -8,6 +8,7 @@ import '../../providers/post_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
 import 'edit_profile_sheet.dart';
+import '../post/post_detail_screen.dart';
 
 /// MobileProfile — Halaman profil pengguna (mobile layout)
 /// Menampilkan header profil, statistik, tab postingan/tersimpan, dan grid foto
@@ -413,7 +414,12 @@ class _MobileProfileState extends State<MobileProfile>
         final post = posts[index];
         return GestureDetector(
           onTap: () {
-            // TODO: Navigasi ke PostDetailScreen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => PostDetailScreen(postId: post.id),
+              ),
+            );
           },
           child: _PostGridTile(post: post),
         );

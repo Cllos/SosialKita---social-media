@@ -11,6 +11,7 @@ import '../../providers/post_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
 import '../profile/other_profile_screen.dart';
+import '../post/post_detail_screen.dart';
 
 /// SearchScreen — Halaman Search / Explore
 ///
@@ -406,15 +407,10 @@ class _SearchScreenState extends State<SearchScreen>
           user: postUser,
           query: _query,
           onTap: () {
-            // TODO: Navigasi ke PostDetailScreen
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Detail postingan — segera hadir'),
-                backgroundColor: AppColors.skCard,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => PostDetailScreen(postId: post.id),
               ),
             );
           },
@@ -496,16 +492,10 @@ class _ExploreGridTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // TODO: Navigasi ke PostDetailScreen
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Detail postingan — segera hadir'),
-            backgroundColor: AppColors.skCard,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            duration: const Duration(seconds: 1),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PostDetailScreen(postId: post.id),
           ),
         );
       },
