@@ -107,7 +107,7 @@ class _PostCardState extends State<PostCard>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Header ──
-              _buildHeader(user, post),
+              _buildHeader(user, post, postProvider),
               const SizedBox(height: 10),
 
               // ── Gambar ──
@@ -129,7 +129,7 @@ class _PostCardState extends State<PostCard>
     );
   }
 
-  Widget _buildHeader(UserModel user, PostModel post) {
+  Widget _buildHeader(UserModel user, PostModel post, PostProvider postProvider) {
     return Row(
       children: [
         GestureDetector(
@@ -202,10 +202,16 @@ class _PostCardState extends State<PostCard>
             ),
           ),
         ),
-        Icon(
-          Icons.more_horiz,
-          color: AppColors.skMuted.withOpacity(0.6),
-          size: 18,
+        GestureDetector(
+          onTap: () => _showPostOptions(context, post, postProvider),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(
+              Icons.more_horiz,
+              color: AppColors.skMuted.withOpacity(0.6),
+              size: 18,
+            ),
+          ),
         ),
       ],
     );
@@ -402,6 +408,223 @@ class _PostCardState extends State<PostCard>
       backgroundColor: Colors.transparent,
       builder: (context) {
         return ShareSheet(post: post);
+      },
+    );
+  }
+
+  void _showPostOptions(BuildContext context, PostModel post, PostProvider postProvider) {
+    final isOwn = post.userId == widget.currentUserId;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) {
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.skCard,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.08),
+              width: 1,
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                if (isOwn) ...[
+                  ListTile(
+                    leading: const Icon(Icons.delete_outline, color: AppColors.skRose),
+                    title: const Text(
+                      'Hapus Postingan',
+                      style: TextStyle(
+                        fontFamily: 'DM Sans',
+                        color: AppColors.skRose,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(sheetCtx);
+                      _confirmDeletePost(context, post, postProvider);
+                    },
+                  ),
+                ] else ...[
+                  ListTile(
+                    leading: const Icon(Icons.outlined_flag, color: Colors.amber),
+                    title: const Text(
+                      'Laporkan Postingan',
+                      style: TextStyle(
+                        fontFamily: 'DM Sans',
+                        color: AppColors.skWhite,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(sheetCtx);
+                      _showReportDialog(context, post, postProvider);
+                    },
+                  ),
+                ],
+                ListTile(
+                  leading: const Icon(Icons.close, color: AppColors.skMuted),
+                  title: const Text(
+                    'Batal',
+                    style: TextStyle(
+                      fontFamily: 'DM Sans',
+                      color: AppColors.skMuted,
+                    ),
+                  ),
+                  onTap: () => Navigator.pop(sheetCtx),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _confirmDeletePost(BuildContext context, PostModel post, PostProvider postProvider) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          backgroundColor: AppColors.skCard,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Colors.white.withOpacity(0.08)),
+          ),
+          title: const Text(
+            'Hapus Postingan?',
+            style: TextStyle(
+              fontFamily: 'Syne',
+              fontWeight: FontWeight.bold,
+              color: AppColors.skWhite,
+            ),
+          ),
+          content: const Text(
+            'Tindakan ini permanen dan tidak dapat dibatalkan.',
+            style: TextStyle(
+              fontFamily: 'DM Sans',
+              color: AppColors.skMuted,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text(
+                'Batal',
+                style: TextStyle(color: AppColors.skMuted),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                postProvider.deletePost(post.id);
+                Navigator.pop(dialogCtx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Postingan berhasil dihapus 🗑️'),
+                    backgroundColor: AppColors.skCard,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.skRose,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Hapus',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showReportDialog(BuildContext context, PostModel post, PostProvider postProvider) {
+    final reasons = [
+      'Spam / Iklan tidak diinginkan',
+      'Ujaran kebencian / Pelecehan',
+      'Konten seksual / Tidak pantas',
+      'Kekerasan / Ancaman berbahaya',
+      'Lainnya'
+    ];
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          backgroundColor: AppColors.skCard,
+          title: const Text(
+            'Pilih Alasan Laporan',
+            style: TextStyle(
+              fontFamily: 'Syne',
+              fontWeight: FontWeight.bold,
+              color: AppColors.skWhite,
+              fontSize: 16,
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Colors.white.withOpacity(0.08)),
+          ),
+          contentPadding: const EdgeInsets.only(top: 10, bottom: 20),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: reasons.length,
+              itemBuilder: (context, index) {
+                final reason = reasons[index];
+                return ListTile(
+                  title: Text(
+                    reason,
+                    style: const TextStyle(
+                      fontFamily: 'DM Sans',
+                      fontSize: 13,
+                      color: AppColors.skWhite,
+                    ),
+                  ),
+                  trailing: const Icon(Icons.chevron_right, size: 16, color: AppColors.skMuted),
+                  onTap: () {
+                    postProvider.reportPost(post.id, widget.currentUserId);
+                    Navigator.pop(dialogCtx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Laporan Anda telah terkirim. Terima kasih! 🛡️'),
+                        backgroundColor: AppColors.skCard,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        );
       },
     );
   }

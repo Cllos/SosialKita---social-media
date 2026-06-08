@@ -275,6 +275,40 @@ class ModeratorDashboard extends StatelessWidget {
                                       color: AppColors.skWhite,
                                     ),
                                   ),
+                                  if (post.reports.isNotEmpty) ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.skRose.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: AppColors.skRose.withOpacity(0.3),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.warning_amber_rounded,
+                                            size: 10,
+                                            color: AppColors.skRose,
+                                          ),
+                                          const SizedBox(width: 3),
+                                          Text(
+                                            'Dilaporkan: ${post.reports.length} Kali',
+                                            style: const TextStyle(
+                                              fontFamily: 'DM Sans',
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.skRose,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                   if (post.location.isNotEmpty) ...[
                                     Text(
                                       ' · ${post.location}',

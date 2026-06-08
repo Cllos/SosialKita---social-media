@@ -5,7 +5,7 @@ import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
-import '../../screens/profile/mobile_profile.dart';
+import '../../screens/profile/profile_screen.dart';
 
 /// UserListSheet — Bottom sheet / dialog list user pengikut / mengikuti
 class UserListSheet extends StatelessWidget {
@@ -99,11 +99,22 @@ class UserListSheet extends StatelessWidget {
                     child: Row(
                       children: [
                         // Avatar
-                        SKAvatar(
-                          imageUrl: user.avatarUrl,
-                          initials: user.avatarInitials,
-                          backgroundColor: user.avatarColor,
-                          size: 40,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProfileScreen(userId: user.id),
+                              ),
+                            );
+                          },
+                          child: SKAvatar(
+                            imageUrl: user.avatarUrl,
+                            initials: user.avatarInitials,
+                            backgroundColor: user.avatarColor,
+                            size: 40,
+                          ),
                         ),
                         const SizedBox(width: 12),
 
@@ -116,7 +127,7 @@ class UserListSheet extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => MobileProfile(userId: user.id),
+                                  builder: (_) => ProfileScreen(userId: user.id),
                                 ),
                               );
                             },

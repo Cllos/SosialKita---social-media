@@ -8,6 +8,7 @@ class PostModel {
   final List<String> tags; // hashtags
   final String location;
   final DateTime createdAt;
+  final List<String> reports; // list of user IDs who reported this post
 
   PostModel({
     required this.id,
@@ -18,9 +19,11 @@ class PostModel {
     List<String>? tags,
     this.location = '',
     DateTime? createdAt,
+    List<String>? reports,
   })  : likes = likes ?? [],
         tags = tags ?? [],
-        createdAt = createdAt ?? DateTime.now();
+        createdAt = createdAt ?? DateTime.now(),
+        reports = reports ?? [];
 
   PostModel copyWith({
     String? id,
@@ -31,6 +34,7 @@ class PostModel {
     List<String>? tags,
     String? location,
     DateTime? createdAt,
+    List<String>? reports,
   }) {
     return PostModel(
       id: id ?? this.id,
@@ -41,6 +45,8 @@ class PostModel {
       tags: tags ?? List.from(this.tags),
       location: location ?? this.location,
       createdAt: createdAt ?? this.createdAt,
+      reports: reports ?? List.from(this.reports),
     );
   }
 }
+

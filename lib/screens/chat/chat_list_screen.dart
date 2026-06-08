@@ -9,6 +9,7 @@ import '../../models/user_model.dart';
 import '../../widgets/common/sk_avatar.dart';
 import '../../core/utils/dummy_data.dart';
 import 'chat_detail_screen.dart';
+import '../profile/profile_screen.dart';
 
 /// ChatListScreen — Menampilkan daftar percakapan DM
 class ChatListScreen extends StatelessWidget {
@@ -167,34 +168,44 @@ class ChatListScreen extends StatelessWidget {
                           child: Row(
                             children: [
                               // Avatar dengan indikator online
-                              Stack(
-                                children: [
-                                  SKAvatar(
-                                    initials: peer.avatarInitials,
-                                    backgroundColor: peer.avatarColor,
-                                    imageUrl: peer.avatarUrl,
-                                    size: 44,
-                                    // Beri ring gradient jika belum dibaca
-                                    showRing: hasUnread,
-                                  ),
-                                  if (isOnline)
-                                    Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: Container(
-                                        width: 12,
-                                        height: 12,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF22C55E),
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: AppColors.skDark,
-                                            width: 2,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ProfileScreen(userId: peer.id),
+                                    ),
+                                  );
+                                },
+                                child: Stack(
+                                  children: [
+                                    SKAvatar(
+                                      initials: peer.avatarInitials,
+                                      backgroundColor: peer.avatarColor,
+                                      imageUrl: peer.avatarUrl,
+                                      size: 44,
+                                      // Beri ring gradient jika belum dibaca
+                                      showRing: hasUnread,
+                                    ),
+                                    if (isOnline)
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: Container(
+                                          width: 12,
+                                          height: 12,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF22C55E),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: AppColors.skDark,
+                                              width: 2,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
                               const SizedBox(width: 12),
 
@@ -356,11 +367,21 @@ class ChatListScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final user = otherUsers[index];
                           return ListTile(
-                            leading: SKAvatar(
-                              initials: user.avatarInitials,
-                              backgroundColor: user.avatarColor,
-                              imageUrl: user.avatarUrl,
-                              size: 40,
+                            leading: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ProfileScreen(userId: user.id),
+                                  ),
+                                );
+                              },
+                              child: SKAvatar(
+                                initials: user.avatarInitials,
+                                backgroundColor: user.avatarColor,
+                                imageUrl: user.avatarUrl,
+                                size: 40,
+                              ),
                             ),
                             title: Text(
                               user.displayName,

@@ -81,6 +81,19 @@ class PostProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Melaporkan postingan
+  void reportPost(String postId, String userId) {
+    final idx = _posts.indexWhere((p) => p.id == postId);
+    if (idx == -1) return;
+    final post = _posts[idx];
+    final reports = List<String>.from(post.reports);
+    if (!reports.contains(userId)) {
+      reports.add(userId);
+      _posts[idx] = post.copyWith(reports: reports);
+      notifyListeners();
+    }
+  }
+
   /// Mendapatkan post berdasarkan ID
   PostModel? getPostById(String postId) {
     try {

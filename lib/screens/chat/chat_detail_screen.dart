@@ -6,6 +6,7 @@ import '../../providers/chat_provider.dart';
 import '../../models/user_model.dart';
 import '../../models/dm_message_model.dart';
 import '../../widgets/common/sk_avatar.dart';
+import '../profile/profile_screen.dart';
 
 /// ChatDetailScreen — Tampilan percakapan/chatting dengan pengguna lain
 class ChatDetailScreen extends StatefulWidget {
@@ -102,39 +103,50 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         titleSpacing: 0,
-        title: Row(
-          children: [
-            SKAvatar(
-              initials: widget.peer.avatarInitials,
-              backgroundColor: widget.peer.avatarColor,
-              imageUrl: widget.peer.avatarUrl,
-              size: 34,
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  widget.peer.username,
-                  style: const TextStyle(
-                    fontFamily: 'DM Sans',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.skWhite,
+        title: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProfileScreen(userId: widget.peer.id),
+              ),
+            );
+          },
+          behavior: HitTestBehavior.opaque,
+          child: Row(
+            children: [
+              SKAvatar(
+                initials: widget.peer.avatarInitials,
+                backgroundColor: widget.peer.avatarColor,
+                imageUrl: widget.peer.avatarUrl,
+                size: 34,
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.peer.username,
+                    style: const TextStyle(
+                      fontFamily: 'DM Sans',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.skWhite,
+                    ),
                   ),
-                ),
-                Text(
-                  isOnline ? '● Online' : 'Offline',
-                  style: TextStyle(
-                    fontFamily: 'DM Sans',
-                    fontSize: 10,
-                    color: isOnline ? const Color(0xFF22C55E) : AppColors.skMuted,
+                  Text(
+                    isOnline ? '● Online' : 'Offline',
+                    style: TextStyle(
+                      fontFamily: 'DM Sans',
+                      fontSize: 10,
+                      color: isOnline ? const Color(0xFF22C55E) : AppColors.skMuted,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
         actions: [
           IconButton(
@@ -272,11 +284,21 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            SKAvatar(
-              initials: widget.peer.avatarInitials,
-              backgroundColor: widget.peer.avatarColor,
-              imageUrl: widget.peer.avatarUrl,
-              size: 24,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProfileScreen(userId: widget.peer.id),
+                  ),
+                );
+              },
+              child: SKAvatar(
+                initials: widget.peer.avatarInitials,
+                backgroundColor: widget.peer.avatarColor,
+                imageUrl: widget.peer.avatarUrl,
+                size: 24,
+              ),
             ),
             const SizedBox(width: 8),
             Column(
