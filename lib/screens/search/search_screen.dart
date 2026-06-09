@@ -12,6 +12,7 @@ import '../../providers/user_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
 import '../profile/other_profile_screen.dart';
 import '../post/post_detail_screen.dart';
+import '../../widgets/post/post_image.dart';
 
 /// SearchScreen — Halaman Search / Explore
 ///
@@ -57,7 +58,11 @@ class _SearchScreenState extends State<SearchScreen>
   }
 
   void _onSearchChanged(String value) {
-    setState(() => _query = value.trim());
+    final trimmed = value.trim();
+    setState(() => _query = trimmed);
+    if (trimmed.isNotEmpty) {
+      context.read<UserProvider>().searchUsersApi(trimmed);
+    }
   }
 
   void _onClearSearch() {
@@ -512,23 +517,9 @@ class _ExploreGridTile extends StatelessWidget {
           children: [
             // Gambar thumbnail
             if (post.imageUrl.isNotEmpty)
-              Image.network(
-                post.imageUrl,
+              PostImage(
+                imageUrl: post.imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _buildPlaceholder(),
-                loadingBuilder: (_, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                      color: AppColors.skRose,
-                      strokeWidth: 2,
-                    ),
-                  );
-                },
               )
             else
               _buildPlaceholder(),
@@ -785,16 +776,9 @@ class _PostResultTile extends StatelessWidget {
                       colors: [Color(0xFF1E103A), Color(0xFF2D1040)],
                     ),
                   ),
-                  child: Image.network(
-                    post.imageUrl,
+                  child: PostImage(
+                    imageUrl: post.imageUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Center(
-                      child: Icon(
-                        Icons.image_outlined,
-                        color: AppColors.skMuted.withOpacity(0.4),
-                        size: 24,
-                      ),
-                    ),
                   ),
                 ),
               ),

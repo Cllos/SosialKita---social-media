@@ -1,4 +1,9 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint, Uint8List;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../models/post_model.dart';
@@ -31,6 +36,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   bool _isSubmitting = false;
   String _previewUrl = '';
+  XFile? _pickedImage;
 
   // Dummy image URLs untuk quick-pick (memudahkan testing)
   static const List<String> _sampleImages = [
@@ -57,6 +63,138 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     return regex.allMatches(caption).map((m) => m.group(1)!).toList();
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+        if (source == ImageSource.camera) {
+          final status = await Permission.camera.request();
+          if (status.isDenied || status.isPermanentlyDenied) {
+            _showPermissionDialog('Kamera');
+            return;
+          }
+        } else if (source == ImageSource.gallery) {
+          PermissionStatus status;
+          if (Platform.isAndroid) {
+            status = await Permission.photos.request();
+            if (status.isDenied) {
+              status = await Permission.storage.request();
+            }
+          } else {
+            status = await Permission.photos.request();
+          }
+
+          if (status.isDenied || status.isPermanentlyDenied) {
+            _showPermissionDialog('Galeri Foto');
+            return;
+          }
+        }
+      }
+
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 1080,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _pickedImage = image;
+          _previewUrl = image.path;
+          _imageUrlController.text = ''; // Clear URL input if picking local
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal mengambil gambar: $e'),
+          backgroundColor: AppColors.skRoseDark,
+        ),
+      );
+    }
+  }
+
+  void _showPermissionDialog(String type) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.skCard,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+        ),
+        title: Text(
+          'Akses $type Diperlukan',
+          style: const TextStyle(
+            fontFamily: 'Syne',
+            color: AppColors.skWhite,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        content: Text(
+          'Aplikasi membutuhkan izin akses $type untuk memilih foto postingan. Harap aktifkan izin di pengaturan aplikasi.',
+          style: const TextStyle(
+            fontFamily: 'DM Sans',
+            color: Colors.white70,
+            fontSize: 13,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Batal',
+              style: TextStyle(color: AppColors.skMuted),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              openAppSettings();
+            },
+            child: const Text(
+              'Pengaturan',
+              style: TextStyle(color: AppColors.skViolet, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPreviewImageWidget() {
+    final isNetwork = _previewUrl.startsWith('http') || _previewUrl.startsWith('blob:') || kIsWeb;
+    if (isNetwork) {
+      return Image.network(
+        _previewUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _buildImagePlaceholder(isError: true),
+        loadingBuilder: (_, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
+              color: AppColors.skRose,
+              strokeWidth: 2,
+            ),
+          );
+        },
+      );
+    } else {
+      return Image.file(
+        File(_previewUrl),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _buildImagePlaceholder(isError: true),
+      );
+    }
+  }
+
   void _onImageUrlChanged(String value) {
     setState(() => _previewUrl = value.trim());
   }
@@ -66,7 +204,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     setState(() => _previewUrl = url);
   }
 
-  void _submitPost() {
+  void _submitPost() async {
     if (!_formKey.currentState!.validate()) return;
     if (_previewUrl.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -88,43 +226,67 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     final postProvider = context.read<PostProvider>();
     final currentUser = auth.currentUser;
 
-    if (currentUser == null) return;
+    if (currentUser == null) {
+      setState(() => _isSubmitting = false);
+      return;
+    }
 
     final caption = _captionController.text.trim();
-    final tags = _parseHashtags(caption);
     final location = _locationController.text.trim();
 
-    final newPost = PostModel(
-      id: 'p_${DateTime.now().millisecondsSinceEpoch}',
-      userId: currentUser.id,
-      imageUrl: _previewUrl,
+    Uint8List? imageBytes;
+    if (_pickedImage == null && _imageUrlController.text.startsWith('http')) {
+      try {
+        final response = await http.get(Uri.parse(_imageUrlController.text));
+        if (response.statusCode == 200) {
+          imageBytes = response.bodyBytes;
+        }
+      } catch (e) {
+        debugPrint('Failed to download image bytes: $e');
+      }
+    }
+
+    final success = await postProvider.uploadPost(
       caption: caption,
-      tags: tags,
       location: location,
-      createdAt: DateTime.now(),
+      imagePath: _pickedImage?.path,
+      imageBytes: imageBytes,
     );
 
-    postProvider.addPost(newPost);
-
-    // Tampilkan snackbar sukses
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-            SizedBox(width: 8),
-            Text('Postingan berhasil dibagikan!'),
-          ],
-        ),
-        backgroundColor: AppColors.skViolet,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-
-    Navigator.pop(context);
+    if (mounted) {
+      setState(() => _isSubmitting = false);
+      
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                SizedBox(width: 8),
+                Text('Postingan berhasil dibagikan!'),
+              ],
+            ),
+            backgroundColor: AppColors.skViolet,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Gagal membagikan postingan ke database'),
+            backgroundColor: AppColors.skRoseDark,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -326,29 +488,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   ? Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.network(
-                          _previewUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => _buildImagePlaceholder(
-                            isError: true,
-                          ),
-                          loadingBuilder: (_, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value:
-                                    loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            loadingProgress
-                                                .expectedTotalBytes!
-                                        : null,
-                                color: AppColors.skRose,
-                                strokeWidth: 2,
-                              ),
-                            );
-                          },
-                        ),
+                        _buildPreviewImageWidget(),
                         // Remove button
                         Positioned(
                           top: 8,
@@ -356,7 +496,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                           child: GestureDetector(
                             onTap: () {
                               _imageUrlController.clear();
-                              setState(() => _previewUrl = '');
+                              setState(() {
+                                _previewUrl = '';
+                                _pickedImage = null;
+                              });
                             },
                             child: Container(
                               width: 28,
@@ -380,6 +523,72 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           ),
         ),
         const SizedBox(height: 12),
+
+        // Buttons to Pick from Camera / Gallery
+        Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () => _pickImage(ImageSource.camera),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.camera_alt_outlined, color: AppColors.skRose, size: 18),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Kamera',
+                        style: TextStyle(
+                          fontFamily: 'DM Sans',
+                          fontSize: 13,
+                          color: AppColors.skWhite,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => _pickImage(ImageSource.gallery),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.photo_library_outlined, color: AppColors.skViolet, size: 18),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Galeri',
+                        style: TextStyle(
+                          fontFamily: 'DM Sans',
+                          fontSize: 13,
+                          color: AppColors.skWhite,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
 
         // URL input field
         Container(
@@ -436,7 +645,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               final url = _sampleImages[index];
               final isSelected = _previewUrl == url;
               return GestureDetector(
-                onTap: () => _pickSampleImage(url),
+                onTap: () {
+                  _pickSampleImage(url);
+                  setState(() {
+                    _pickedImage = null;
+                  });
+                },
                 child: Container(
                   width: 60,
                   height: 60,

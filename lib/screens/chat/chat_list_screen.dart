@@ -12,8 +12,23 @@ import 'chat_detail_screen.dart';
 import '../profile/profile_screen.dart';
 
 /// ChatListScreen — Menampilkan daftar percakapan DM
-class ChatListScreen extends StatelessWidget {
+class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
+
+  @override
+  State<ChatListScreen> createState() => _ChatListScreenState();
+}
+
+class _ChatListScreenState extends State<ChatListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) {
+        context.read<ChatProvider>().fetchConversations();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

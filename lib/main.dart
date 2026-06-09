@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
+import 'core/utils/responsive_layout.dart';
 import 'providers/auth_provider.dart';
 import 'providers/post_provider.dart';
 import 'providers/comment_provider.dart';
@@ -11,8 +12,16 @@ import 'providers/story_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/moderator/moderator_dashboard.dart';
+import 'screens/moderator/desktop_only_screen.dart';
+import 'services/local_storage_service.dart';
 
-void main() {
+Future<void> main() async {
+  // Wajib dipanggil sebelum inisialisasi plugin apapun
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inisialisasi SharedPreferences
+  await LocalStorageService.init();
+
   runApp(const SosialKitaApp());
 }
 
@@ -37,10 +46,13 @@ class SosialKitaApp extends StatelessWidget {
         theme: buildAppTheme(),
         home: Consumer<AuthProvider>(
           builder: (context, auth, _) {
-            // Jika sudah login → ke HomeScreen (atau ModeratorDashboard jika Moderator), belum → ke LoginScreen
             if (auth.isLoggedIn) {
               if (auth.isModerator) {
-                return const ModeratorDashboard();
+                // Admin Panel hanya tersedia di desktop
+                return const ResponsiveLayout(
+                  mobile: DesktopOnlyScreen(),
+                  desktop: ModeratorDashboard(),
+                );
               }
               return const HomeScreen();
             }

@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../models/user_model.dart';
@@ -23,6 +27,108 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   late TextEditingController _avatarUrlController;
   late Color _selectedColor;
   final _formKey = GlobalKey<FormState>();
+
+
+  Future<void> _pickAvatar(ImageSource source) async {
+    try {
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+        if (source == ImageSource.camera) {
+          final status = await Permission.camera.request();
+          if (status.isDenied || status.isPermanentlyDenied) {
+            _showPermissionDialog('Kamera');
+            return;
+          }
+        } else if (source == ImageSource.gallery) {
+          PermissionStatus status;
+          if (Platform.isAndroid) {
+            status = await Permission.photos.request();
+            if (status.isDenied) {
+              status = await Permission.storage.request();
+            }
+          } else {
+            status = await Permission.photos.request();
+          }
+
+          if (status.isDenied || status.isPermanentlyDenied) {
+            _showPermissionDialog('Galeri Foto');
+            return;
+          }
+        }
+      }
+
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 500,
+        maxHeight: 500,
+        imageQuality: 80,
+      );
+
+      if (image != null) {
+        setState(() {
+          _avatarUrlController.text = image.path;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking avatar: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal mengambil gambar avatar: $e'),
+          backgroundColor: AppColors.skRose,
+        ),
+      );
+    }
+  }
+
+  void _showPermissionDialog(String type) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.skCard,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+        ),
+        title: Text(
+          'Akses $type Diperlukan',
+          style: const TextStyle(
+            fontFamily: 'Syne',
+            color: AppColors.skWhite,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        content: Text(
+          'Aplikasi membutuhkan izin akses $type untuk memilih foto profil. Harap aktifkan izin di pengaturan aplikasi.',
+          style: const TextStyle(
+            fontFamily: 'DM Sans',
+            color: Colors.white70,
+            fontSize: 13,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Batal',
+              style: TextStyle(color: AppColors.skMuted),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              openAppSettings();
+            },
+            child: const Text(
+              'Pengaturan',
+              style: TextStyle(color: AppColors.skViolet, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   final List<String> _sampleAvatars = [
     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
@@ -122,7 +228,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -157,8 +263,56 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                       style: TextStyle(
                         fontFamily: 'DM Sans',
                         fontSize: 12,
-                        color: AppColors.skMuted.withOpacity(0.8),
+                        color: AppColors.skMuted.withValues(alpha: 0.8),
                       ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Camera / Gallery Buttons for Profile Photo
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () => _pickAvatar(ImageSource.camera),
+                          icon: const Icon(Icons.camera_alt_outlined, size: 14, color: AppColors.skWhite),
+                          label: const Text(
+                            'Kamera',
+                            style: TextStyle(
+                              fontFamily: 'DM Sans',
+                              fontSize: 11,
+                              color: AppColors.skWhite,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white.withValues(alpha: 0.06),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          onPressed: () => _pickAvatar(ImageSource.gallery),
+                          icon: const Icon(Icons.photo_library_outlined, size: 14, color: AppColors.skWhite),
+                          label: const Text(
+                            'Galeri',
+                            style: TextStyle(
+                              fontFamily: 'DM Sans',
+                              fontSize: 11,
+                              color: AppColors.skWhite,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white.withValues(alpha: 0.06),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -210,7 +364,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                   counterStyle: TextStyle(
                     fontFamily: 'DM Sans',
                     fontSize: 11,
-                    color: AppColors.skMuted.withOpacity(0.6),
+                    color: AppColors.skMuted.withValues(alpha: 0.6),
                   ),
                 ),
               ),
@@ -342,7 +496,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.skRose.withOpacity(0.3),
+                        color: AppColors.skRose.withValues(alpha: 0.3),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
                       ),
@@ -373,7 +527,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
                   child: const Center(
@@ -402,7 +556,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
         fontFamily: 'DM Sans',
         fontSize: 11,
         fontWeight: FontWeight.w600,
-        color: AppColors.skMuted.withOpacity(0.8),
+        color: AppColors.skMuted.withValues(alpha: 0.8),
         letterSpacing: 0.8,
       ),
     );
@@ -417,22 +571,22 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
       hintStyle: TextStyle(
         fontFamily: 'DM Sans',
         fontSize: 13,
-        color: AppColors.skMuted.withOpacity(0.5),
+        color: AppColors.skMuted.withValues(alpha: 0.5),
       ),
       prefixIcon: Icon(
         icon,
-        color: AppColors.skMuted.withOpacity(0.6),
+        color: AppColors.skMuted.withValues(alpha: 0.6),
         size: 20,
       ),
       filled: true,
-      fillColor: Colors.white.withOpacity(0.05),
+      fillColor: Colors.white.withValues(alpha: 0.05),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

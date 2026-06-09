@@ -28,6 +28,17 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final ScrollController _scrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) {
+        context.read<ChatProvider>().fetchMessages(widget.peer.id);
+        context.read<ChatProvider>().markAsReadApi(widget.peer.id);
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();

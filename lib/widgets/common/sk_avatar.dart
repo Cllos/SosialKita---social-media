@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -46,37 +48,7 @@ class SKAvatar extends StatelessWidget {
       child: hasImage
           ? ClipRRect(
               borderRadius: BorderRadius.circular(size / 2),
-              child: Image.network(
-                imageUrl!,
-                width: size,
-                height: size,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          backgroundColor,
-                          backgroundColor.withOpacity(0.7),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        initials,
-                        style: TextStyle(
-                          fontFamily: 'DM Sans',
-                          color: Colors.white,
-                          fontSize: size * 0.35,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+              child: _buildAvatarImage(),
             )
           : Center(
               child: Text(
@@ -103,6 +75,54 @@ class SKAvatar extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(2),
       child: avatar,
+    );
+  }
+
+  Widget _buildAvatarImage() {
+    final isNetwork = imageUrl!.startsWith('http') || imageUrl!.startsWith('blob:') || kIsWeb;
+
+    if (isNetwork) {
+      return Image.network(
+        imageUrl!,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildErrorFallback(),
+      );
+    } else {
+      return Image.file(
+        File(imageUrl!),
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildErrorFallback(),
+      );
+    }
+  }
+
+  Widget _buildErrorFallback() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            backgroundColor,
+            backgroundColor.withOpacity(0.7),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          initials,
+          style: TextStyle(
+            fontFamily: 'DM Sans',
+            color: Colors.white,
+            fontSize: size * 0.35,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
     );
   }
 }

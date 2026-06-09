@@ -21,7 +21,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ── Rate limiting ──
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 menit
-  max: 100,
+  max: 10000,
   message: { success: false, message: 'Terlalu banyak request, coba lagi nanti' }
 });
 app.use('/api', limiter);

@@ -12,6 +12,7 @@ import '../../providers/user_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
 import '../../widgets/layout/desktop_sidebar.dart';
 import '../profile/other_profile_screen.dart';
+import '../../widgets/post/post_image.dart';
 
 /// DesktopSearchPage — Halaman pencarian full-page untuk desktop
 /// Layout: sidebar kiri + konten pencarian di tengah
@@ -49,7 +50,11 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
   }
 
   void _onSearchChanged(String value) {
-    setState(() => _query = value.trim());
+    final trimmed = value.trim();
+    setState(() => _query = trimmed);
+    if (trimmed.isNotEmpty) {
+      context.read<UserProvider>().searchUsersApi(trimmed);
+    }
   }
 
   void _onClearSearch() {
@@ -553,23 +558,9 @@ class _DesktopExploreTileState extends State<_DesktopExploreTile> {
             fit: StackFit.expand,
             children: [
               if (widget.post.imageUrl.isNotEmpty)
-                Image.network(
-                  widget.post.imageUrl,
+                PostImage(
+                  imageUrl: widget.post.imageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildPlaceholder(),
-                  loadingBuilder: (_, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                        color: AppColors.skRose,
-                        strokeWidth: 2,
-                      ),
-                    );
-                  },
                 )
               else
                 _buildPlaceholder(),
@@ -820,16 +811,9 @@ class _DesktopPostResultTileState extends State<_DesktopPostResultTile> {
                         colors: [Color(0xFF1E103A), Color(0xFF2D1040)],
                       ),
                     ),
-                    child: Image.network(
-                      widget.post.imageUrl,
+                    child: PostImage(
+                      imageUrl: widget.post.imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Center(
-                        child: Icon(
-                          Icons.image_outlined,
-                          color: AppColors.skMuted.withOpacity(0.4),
-                          size: 28,
-                        ),
-                      ),
                     ),
                   ),
                 ),

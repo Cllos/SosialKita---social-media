@@ -27,13 +27,23 @@ class _CommentSheetState extends State<CommentSheet> {
   final ScrollController _scrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) {
+        context.read<CommentProvider>().fetchComments(widget.postId);
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _commentController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _submitComment() {
+  void _submitComment() async {
     final text = _commentController.text.trim();
     if (text.isEmpty) return;
 
@@ -43,27 +53,21 @@ class _CommentSheetState extends State<CommentSheet> {
 
     if (currentUser == null) return;
 
-    final newComment = CommentModel(
-      id: 'c_${DateTime.now().millisecondsSinceEpoch}',
-      postId: widget.postId,
-      userId: currentUser.id,
-      text: text,
-      createdAt: DateTime.now(),
-    );
+    final success = await commentProvider.addComment(context, widget.postId, text);
+    if (success) {
+      _commentController.clear();
 
-    commentProvider.addComment(newComment);
-    _commentController.clear();
-
-    // Scroll ke bagian paling bawah agar komentar baru terlihat
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
+      // Scroll ke bagian paling bawah agar komentar baru terlihat
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
   }
 
   @override
@@ -216,7 +220,7 @@ class _CommentSheetState extends State<CommentSheet> {
                               IconButton(
                                 icon: const Icon(Icons.delete_outline, size: 16, color: AppColors.skRose),
                                 onPressed: () {
-                                  commentProvider.deleteComment(comment.id);
+                                  commentProvider.deleteComment(context, comment.id, widget.postId);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: const Text('Komentar dihapus'),

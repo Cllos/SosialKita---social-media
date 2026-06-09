@@ -61,11 +61,11 @@ class SKTextField extends StatelessWidget {
             hintText: hint,
             hintStyle: TextStyle(
               fontFamily: 'DM Sans',
-              color: AppColors.skMuted.withOpacity(0.6),
+              color: AppColors.skMuted.withValues(alpha: 0.6),
               fontSize: 14,
             ),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 12,
@@ -86,13 +86,13 @@ class SKTextField extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
             focusedBorder: OutlineInputBorder(

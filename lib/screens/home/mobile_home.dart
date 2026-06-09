@@ -10,6 +10,7 @@ import '../search/search_screen.dart';
 import '../post/create_post_screen.dart';
 import '../chat/chat_list_screen.dart';
 import '../../providers/chat_provider.dart';
+import '../../providers/story_provider.dart';
 import '../post/saved_posts_screen.dart';
 import '../notification/notification_screen.dart';
 import '../../providers/notification_provider.dart';
@@ -25,6 +26,18 @@ class MobileHome extends StatefulWidget {
 
 class _MobileHomeState extends State<MobileHome> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) {
+        context.read<PostProvider>().fetchPosts();
+        context.read<StoryProvider>().fetchStories();
+        context.read<ChatProvider>().fetchConversations();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

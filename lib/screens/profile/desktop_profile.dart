@@ -14,6 +14,7 @@ import '../story/story_view_screen.dart';
 import '../../widgets/layout/desktop_sidebar.dart';
 import 'edit_profile_sheet.dart';
 import '../post/post_detail_screen.dart';
+import '../../widgets/post/post_image.dart';
 
 /// DesktopProfile — Halaman profil pengguna (desktop layout)
 /// Menampilkan sidebar kiri + konten profil di tengah
@@ -37,6 +38,14 @@ class _DesktopProfileState extends State<DesktopProfile>
       length: _isOwnProfileInit ? 2 : 1,
       vsync: this,
     );
+    Future.microtask(() {
+      if (mounted) {
+        final userId = widget.userId ?? context.read<AuthProvider>().currentUser?.id;
+        if (userId != null) {
+          context.read<UserProvider>().fetchFollowersAndFollowing(userId);
+        }
+      }
+    });
   }
 
   bool get _isOwnProfileInit {
@@ -668,19 +677,9 @@ class _DesktopPostGridTileState extends State<_DesktopPostGridTile> {
             if (widget.post.imageUrl.isNotEmpty)
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
-                child: Image.network(
-                  widget.post.imageUrl,
+                child: PostImage(
+                  imageUrl: widget.post.imageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: const Color(0xFF1E103A),
-                    child: Center(
-                      child: Icon(
-                        Icons.broken_image_outlined,
-                        color: AppColors.skMuted.withOpacity(0.4),
-                        size: 28,
-                      ),
-                    ),
-                  ),
                 ),
               )
             else

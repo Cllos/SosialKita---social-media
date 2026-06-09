@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sosialkita/core/utils/dummy_data.dart';
@@ -60,15 +62,18 @@ class _StoryViewScreenState extends State<StoryViewScreen>
   }
 
   void _markCurrentStoryAsViewed() {
-    final authProvider = context.read<AuthProvider>();
-    final currentUser = authProvider.currentUser;
-    if (currentUser != null && _currentIndex < _localStories.length) {
-      final currentStory = _localStories[_currentIndex];
-      context.read<StoryProvider>().markStoryAsViewed(
-        currentStory.id,
-        currentUser.id,
-      );
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final authProvider = context.read<AuthProvider>();
+      final currentUser = authProvider.currentUser;
+      if (currentUser != null && _currentIndex < _localStories.length) {
+        final currentStory = _localStories[_currentIndex];
+        context.read<StoryProvider>().markStoryAsViewed(
+          currentStory.id,
+          currentUser.id,
+        );
+      }
+    });
   }
 
   void _nextStory() {
@@ -200,6 +205,58 @@ class _StoryViewScreenState extends State<StoryViewScreen>
     }
   }
 
+  Widget _buildStoryImage(StoryModel story) {
+    final isNetwork = story.mediaUrl.startsWith('http') || story.mediaUrl.startsWith('blob:') || kIsWeb;
+    if (isNetwork) {
+      return Image.network(
+        story.mediaUrl,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) {
+            // Jalankan animasi hanya saat gambar selesai di-load
+            if (!_animController.isAnimating) {
+              _animController.forward();
+            }
+            return child;
+          }
+          // Pause animasi saat loading gambar
+          _animController.stop();
+          return const Center(
+            child: CircularProgressIndicator(
+              color: AppColors.skRose,
+            ),
+          );
+        },
+        errorBuilder: (_, __, ___) => const Center(
+          child: Icon(
+            Icons.broken_image_outlined,
+            color: AppColors.skMuted,
+            size: 48,
+          ),
+        ),
+      );
+    } else {
+      // Local image file
+      // Auto-start animation since local image does not need network loading
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_animController.isAnimating) {
+          _animController.forward();
+        }
+      });
+      return Image.file(
+        File(story.mediaUrl),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const Center(
+          child: Icon(
+            Icons.broken_image_outlined,
+            color: AppColors.skMuted,
+            size: 48,
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_localStories.isEmpty) return const SizedBox.shrink();
@@ -242,33 +299,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                 },
                 child: Container(
                   color: Colors.black,
-                  child: Image.network(
-                    story.mediaUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) {
-                        // Jalankan animasi hanya saat gambar selesai di-load
-                        if (!_animController.isAnimating) {
-                          _animController.forward();
-                        }
-                        return child;
-                      }
-                      // Pause animasi saat loading gambar
-                      _animController.stop();
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.skRose,
-                        ),
-                      );
-                    },
-                    errorBuilder: (_, __, ___) => const Center(
-                      child: Icon(
-                        Icons.broken_image_outlined,
-                        color: AppColors.skMuted,
-                        size: 48,
-                      ),
-                    ),
-                  ),
+                  child: _buildStoryImage(story),
                 ),
               ),
             ),

@@ -3,7 +3,7 @@ import '../../core/theme/app_colors.dart';
 import '../../screens/post/create_post_screen.dart';
 
 /// DesktopSidebar — Navigasi sidebar kiri untuk layout desktop
-/// Sesuai design sosialkita_ui.html (.desk-sidebar)
+/// Menggunakan InkWell untuk kompatibilitas web yang lebih baik.
 class DesktopSidebar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemTap;
@@ -22,7 +22,7 @@ class DesktopSidebar extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           right: BorderSide(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
           ),
         ),
       ),
@@ -98,44 +98,50 @@ class DesktopSidebar extends StatelessWidget {
           const SizedBox(height: 8),
 
           // ── Buat Postingan ──
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const CreatePostScreen(),
-                ),
-              );
-            },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                gradient: AppColors.skGradientBtn,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.skRose.withOpacity(0.25),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CreatePostScreen(),
                   ),
-                ],
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.add, color: Colors.white, size: 18),
-                  SizedBox(width: 6),
-                  Text(
-                    'Buat Postingan',
-                    style: TextStyle(
-                      fontFamily: 'DM Sans',
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                );
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Ink(
+                decoration: BoxDecoration(
+                  gradient: AppColors.skGradientBtn,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.skRose.withValues(alpha: 0.25),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
                     ),
+                  ],
+                ),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add, color: Colors.white, size: 18),
+                      SizedBox(width: 6),
+                      Text(
+                        'Buat Postingan',
+                        style: TextStyle(
+                          fontFamily: 'DM Sans',
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -160,46 +166,54 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        margin: const EdgeInsets.only(bottom: 2),
-        decoration: BoxDecoration(
-          color: isActive
-              ? AppColors.skRose.withOpacity(0.12)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isActive ? AppColors.skRose : AppColors.skMuted,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontFamily: 'DM Sans',
-                  fontSize: 13,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        mouseCursor: SystemMouseCursors.click,
+        child: Ink(
+          decoration: BoxDecoration(
+            color: isActive
+                ? AppColors.skRose.withValues(alpha: 0.12)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            margin: const EdgeInsets.only(bottom: 2),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 20,
                   color: isActive ? AppColors.skRose : AppColors.skMuted,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                 ),
-              ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontFamily: 'DM Sans',
+                      fontSize: 13,
+                      color: isActive ? AppColors.skRose : AppColors.skMuted,
+                      fontWeight:
+                          isActive ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                ),
+                if (isActive)
+                  Container(
+                    width: 5,
+                    height: 5,
+                    decoration: const BoxDecoration(
+                      color: AppColors.skRose,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
             ),
-            if (isActive)
-              Container(
-                width: 5,
-                height: 5,
-                decoration: const BoxDecoration(
-                  color: AppColors.skRose,
-                  shape: BoxShape.circle,
-                ),
-              ),
-          ],
+          ),
         ),
       ),
     );

@@ -41,6 +41,17 @@ dependencies:
   # Google Fonts (Syne + DM Sans)
   google_fonts: ^6.2.1
 
+  # Image Picker & Permissions
+  image_picker: ^1.0.4
+  permission_handler: ^11.0.1
+
+  # Local Data Persistence
+  shared_preferences: ^2.2.2
+
+  # Networking & REST API
+  http: ^1.2.0
+  http_parser: ^4.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

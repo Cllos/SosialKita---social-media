@@ -12,6 +12,7 @@ import '../../screens/profile/other_profile_screen.dart';
 import '../../screens/post/comment_sheet.dart';
 import '../../screens/post/share_sheet.dart';
 import '../common/sk_avatar.dart';
+import 'post_image.dart';
 
 /// PostCard — Card postingan di feed
 /// Menampilkan header (avatar, nama, lokasi), gambar, caption, dan aksi
@@ -99,7 +100,7 @@ class _PostCardState extends State<PostCard>
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -186,7 +187,7 @@ class _PostCardState extends State<PostCard>
                     style: TextStyle(
                       fontFamily: 'DM Sans',
                       fontSize: 11,
-                      color: AppColors.skMuted.withOpacity(0.8),
+                      color: AppColors.skMuted.withValues(alpha: 0.8),
                     ),
                   )
                 else
@@ -195,7 +196,7 @@ class _PostCardState extends State<PostCard>
                     style: TextStyle(
                       fontFamily: 'DM Sans',
                       fontSize: 11,
-                      color: AppColors.skMuted.withOpacity(0.8),
+                      color: AppColors.skMuted.withValues(alpha: 0.8),
                     ),
                   ),
               ],
@@ -208,7 +209,7 @@ class _PostCardState extends State<PostCard>
             padding: const EdgeInsets.all(8.0),
             child: Icon(
               Icons.more_horiz,
-              color: AppColors.skMuted.withOpacity(0.6),
+              color: AppColors.skMuted.withValues(alpha: 0.6),
               size: 18,
             ),
           ),
@@ -236,29 +237,9 @@ class _PostCardState extends State<PostCard>
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Image.network(
-                post.imageUrl,
+              child: PostImage(
+                imageUrl: post.imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Center(
-                  child: Icon(
-                    Icons.image_outlined,
-                    color: AppColors.skMuted,
-                    size: 40,
-                  ),
-                ),
-                loadingBuilder: (_, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                      color: AppColors.skRose,
-                      strokeWidth: 2,
-                    ),
-                  );
-                },
               ),
             ),
           ),
@@ -339,7 +320,7 @@ class _PostCardState extends State<PostCard>
         // Like
         _ActionButton(
           icon: isLiked ? Icons.favorite : Icons.favorite_border,
-          label: post.likes.length > 0 ? '${post.likes.length}' : '',
+          label: post.likes.isNotEmpty ? '${post.likes.length}' : '',
           color: isLiked ? AppColors.skRose : AppColors.skMuted,
           onTap: _onTapLike,
         ),
@@ -426,7 +407,7 @@ class _PostCardState extends State<PostCard>
               topRight: Radius.circular(20),
             ),
             border: Border.all(
-              color: Colors.white.withOpacity(0.08),
+              color: Colors.white.withValues(alpha: 0.08),
               width: 1,
             ),
           ),
@@ -504,7 +485,7 @@ class _PostCardState extends State<PostCard>
           backgroundColor: AppColors.skCard,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.white.withOpacity(0.08)),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
           ),
           title: const Text(
             'Hapus Postingan?',
@@ -586,10 +567,10 @@ class _PostCardState extends State<PostCard>
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.white.withOpacity(0.08)),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
           ),
           contentPadding: const EdgeInsets.only(top: 10, bottom: 20),
-          content: Container(
+          content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,

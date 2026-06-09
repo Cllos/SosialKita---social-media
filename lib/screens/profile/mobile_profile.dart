@@ -13,6 +13,7 @@ import '../../widgets/profile/user_list_sheet.dart';
 import '../story/story_view_screen.dart';
 import 'edit_profile_sheet.dart';
 import '../post/post_detail_screen.dart';
+import '../../widgets/post/post_image.dart';
 
 /// MobileProfile — Halaman profil pengguna (mobile layout)
 /// Menampilkan header profil, statistik, tab postingan/tersimpan, dan grid foto
@@ -40,6 +41,14 @@ class _MobileProfileState extends State<MobileProfile>
       length: _isOwnProfile ? 2 : 1,
       vsync: this,
     );
+    Future.microtask(() {
+      if (mounted) {
+        final userId = widget.userId ?? context.read<AuthProvider>().currentUser?.id;
+        if (userId != null) {
+          context.read<UserProvider>().fetchFollowersAndFollowing(userId);
+        }
+      }
+    });
   }
 
   @override
@@ -658,29 +667,9 @@ class _PostGridTile extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: Image.network(
-        post.imageUrl,
+      child: PostImage(
+        imageUrl: post.imageUrl,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Center(
-          child: Icon(
-            Icons.broken_image_outlined,
-            color: AppColors.skMuted.withOpacity(0.4),
-            size: 28,
-          ),
-        ),
-        loadingBuilder: (_, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                  : null,
-              color: AppColors.skRose,
-              strokeWidth: 2,
-            ),
-          );
-        },
       ),
     );
   }

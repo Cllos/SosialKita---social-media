@@ -35,7 +35,10 @@ class ModeratorDashboard extends StatelessWidget {
     // Ambil data untuk statistik
     final totalUsers = dummyUsers.length;
     final totalPosts = postProvider.posts.length;
-    final totalComments = commentProvider.comments.length;
+    final totalComments = postProvider.posts.fold<int>(
+      0,
+      (sum, post) => sum + postProvider.getCommentCount(post.id),
+    );
     
     // Ambil semua post urut terbaru
     final allPosts = postProvider.getAllPosts();
@@ -70,7 +73,7 @@ class ModeratorDashboard extends StatelessWidget {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             height: 1,
           ),
         ),
@@ -119,9 +122,9 @@ class ModeratorDashboard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.skRose.withOpacity(0.15),
+                      color: AppColors.skRose.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.skRose.withOpacity(0.3)),
+                      border: Border.all(color: AppColors.skRose.withValues(alpha: 0.3)),
                     ),
                     child: const Row(
                       children: [
@@ -233,7 +236,7 @@ class ModeratorDashboard extends StatelessWidget {
                       color: AppColors.skCard,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.04),
+                        color: Colors.white.withValues(alpha: 0.04),
                       ),
                     ),
                     child: Row(
@@ -331,7 +334,7 @@ class ModeratorDashboard extends StatelessWidget {
                                 style: TextStyle(
                                   fontFamily: 'DM Sans',
                                   fontSize: 12,
-                                  color: AppColors.skWhite.withOpacity(0.7),
+                                  color: AppColors.skWhite.withValues(alpha: 0.7),
                                 ),
                               ),
                               const SizedBox(height: 6),
@@ -372,7 +375,7 @@ class ModeratorDashboard extends StatelessWidget {
         color: AppColors.skCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.white.withOpacity(0.04),
+          color: Colors.white.withValues(alpha: 0.04),
         ),
       ),
       child: Column(

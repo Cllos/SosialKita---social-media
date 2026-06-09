@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>SosialKita membutuhkan akses kamera untuk mengambil gambar postingan.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SosialKita membutuhkan akses galeri untuk memilih gambar postingan.</string>
 </dict>
 </plist>
