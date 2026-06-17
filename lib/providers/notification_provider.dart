@@ -7,16 +7,16 @@ class NotificationProvider extends ChangeNotifier {
     NotificationModel(
       id: 'n1',
       type: NotificationType.like,
-      fromUserId: 'u2', // siti_rahma
-      postId: 'p1', // Sunset Losari
+      fromUserId: '2', // siti_rahma
+      postId: '1', // Sunset Losari
       createdAt: DateTime.now().subtract(const Duration(minutes: 15)),
       isRead: false,
     ),
     NotificationModel(
       id: 'n2',
       type: NotificationType.comment,
-      fromUserId: 'u5', // reza_h
-      postId: 'p1',
+      fromUserId: '5', // reza_h
+      postId: '1',
       commentText: 'Resep coto makassar-nya mantap betul gan!',
       createdAt: DateTime.now().subtract(const Duration(hours: 1)),
       isRead: false,
@@ -24,15 +24,15 @@ class NotificationProvider extends ChangeNotifier {
     NotificationModel(
       id: 'n3',
       type: NotificationType.follow,
-      fromUserId: 'u3', // maulana_b
+      fromUserId: '3', // maulana_b
       createdAt: DateTime.now().subtract(const Duration(hours: 3)),
       isRead: true,
     ),
     NotificationModel(
       id: 'n4',
       type: NotificationType.like,
-      fromUserId: 'u4', // fitri_dewi
-      postId: 'p2', // Coto Makassar
+      fromUserId: '4', // fitri_dewi
+      postId: '2', // Coto Makassar
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
       isRead: true,
     ),

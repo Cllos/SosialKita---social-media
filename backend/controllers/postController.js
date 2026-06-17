@@ -13,8 +13,8 @@ exports.createPost = async (req, res) => {
       return error(res, 'Gambar wajib diupload', 400);
     }
 
-    // URL gambar — lokal storage
-    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    // URL gambar — lokal storage (simpan relative path agar portabel)
+    const imageUrl = `uploads/${req.file.filename}`;
 
     const post = await Post.create({
       user_id: req.user.id,

@@ -6,6 +6,9 @@ const upload = require('../middleware/uploadMiddleware');
 // GET /search?q=keyword — Cari user (harus sebelum /:username)
 router.get('/search', auth, userController.searchUser);
 
+// GET /id/:id — Profil user by ID
+router.get('/id/:id', auth, userController.getProfileById);
+
 // GET /:username — Profil user by username
 router.get('/:username', auth, userController.getProfile);
 

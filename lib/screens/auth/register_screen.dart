@@ -44,7 +44,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = context.read<AuthProvider>();
-    final success = await authProvider.register(
+    final errorMsg = await authProvider.register(
       _nameController.text.trim(),
       _usernameController.text.trim().toLowerCase(),
       _emailController.text.trim(),
@@ -53,7 +53,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (!mounted) return;
 
-    if (success) {
+    if (errorMsg == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Registrasi berhasil! Selamat datang, ${_nameController.text.trim()} 👋'),
@@ -70,7 +70,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Navigator.pop(context); 
     } else {
       setState(() {
-        _errorMessage = 'Email atau username sudah terdaftar';
+        _errorMessage = errorMsg;
       });
     }
   }

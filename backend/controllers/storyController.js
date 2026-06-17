@@ -10,7 +10,7 @@ exports.createStory = async (req, res) => {
       return error(res, 'Gambar wajib diupload', 400);
     }
 
-    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    const imageUrl = `uploads/${req.file.filename}`;
 
     // Story expires setelah 24 jam
     const expiresAt = new Date();

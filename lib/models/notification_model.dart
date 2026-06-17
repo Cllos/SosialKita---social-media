@@ -4,6 +4,7 @@ enum NotificationType {
   like,
   comment,
   follow,
+  message,
 }
 
 /// Model untuk Notifikasi SosialKita

@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/chat_provider.dart';
+import '../../providers/notification_provider.dart';
 import '../../models/user_model.dart';
 import '../../models/dm_message_model.dart';
+import '../../models/notification_model.dart';
 import '../../widgets/common/sk_avatar.dart';
 import '../profile/profile_screen.dart';
 
@@ -61,6 +63,18 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       currentUser.id,
       widget.peer.id,
       text,
+    );
+
+    // Tambah notifikasi pesan baru
+    context.read<NotificationProvider>().addNotification(
+      NotificationModel(
+        id: 'dm_${DateTime.now().millisecondsSinceEpoch}',
+        type: NotificationType.message,
+        fromUserId: currentUser.id,
+        commentText: text,
+        createdAt: DateTime.now(),
+        isRead: false,
+      ),
     );
 
     _messageController.clear();

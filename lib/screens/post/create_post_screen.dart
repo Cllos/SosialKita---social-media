@@ -9,6 +9,7 @@ import '../../core/theme/app_colors.dart';
 import '../../models/post_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/post_provider.dart';
+import '../../services/api_service.dart';
 
 /// CreatePostScreen — Halaman buat postingan baru
 ///
@@ -169,7 +170,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     final isNetwork = _previewUrl.startsWith('http') || _previewUrl.startsWith('blob:') || kIsWeb;
     if (isNetwork) {
       return Image.network(
-        _previewUrl,
+        ApiService.resolveImageUrl(_previewUrl),
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => _buildImagePlaceholder(isError: true),
         loadingBuilder: (_, child, loadingProgress) {
@@ -669,7 +670,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       fit: StackFit.expand,
                       children: [
                         Image.network(
-                          url,
+                          ApiService.resolveImageUrl(url),
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
                             color: AppColors.skCard,

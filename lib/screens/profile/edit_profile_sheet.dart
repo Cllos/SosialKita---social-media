@@ -9,6 +9,7 @@ import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
 import '../../widgets/common/sk_text_field.dart';
+import '../../services/api_service.dart';
 
 /// EditProfileSheet — Bottom sheet / dialog untuk edit profil pengguna
 /// Mengubah displayName, bio, avatarUrl, dan avatarColor
@@ -27,7 +28,6 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   late TextEditingController _avatarUrlController;
   late Color _selectedColor;
   final _formKey = GlobalKey<FormState>();
-
 
   Future<void> _pickAvatar(ImageSource source) async {
     try {
@@ -122,7 +122,10 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
             },
             child: const Text(
               'Pengaturan',
-              style: TextStyle(color: AppColors.skViolet, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: AppColors.skViolet,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -195,9 +198,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
         content: const Text('Profil berhasil diperbarui ✨'),
         backgroundColor: AppColors.skCard,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -273,7 +274,11 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                       children: [
                         ElevatedButton.icon(
                           onPressed: () => _pickAvatar(ImageSource.camera),
-                          icon: const Icon(Icons.camera_alt_outlined, size: 14, color: AppColors.skWhite),
+                          icon: const Icon(
+                            Icons.camera_alt_outlined,
+                            size: 14,
+                            color: AppColors.skWhite,
+                          ),
                           label: const Text(
                             'Kamera',
                             style: TextStyle(
@@ -283,8 +288,13 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white.withValues(alpha: 0.06),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.06,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -294,7 +304,11 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                         const SizedBox(width: 8),
                         ElevatedButton.icon(
                           onPressed: () => _pickAvatar(ImageSource.gallery),
-                          icon: const Icon(Icons.photo_library_outlined, size: 14, color: AppColors.skWhite),
+                          icon: const Icon(
+                            Icons.photo_library_outlined,
+                            size: 14,
+                            color: AppColors.skWhite,
+                          ),
                           label: const Text(
                             'Galeri',
                             style: TextStyle(
@@ -304,8 +318,13 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white.withValues(alpha: 0.06),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.06,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -357,16 +376,17 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                 ),
                 maxLines: 2,
                 maxLength: 150,
-                decoration: _inputDecoration(
-                  hint: 'Ceritakan tentang dirimu...',
-                  icon: Icons.edit_note_rounded,
-                ).copyWith(
-                  counterStyle: TextStyle(
-                    fontFamily: 'DM Sans',
-                    fontSize: 11,
-                    color: AppColors.skMuted.withValues(alpha: 0.6),
-                  ),
-                ),
+                decoration:
+                    _inputDecoration(
+                      hint: 'Ceritakan tentang dirimu...',
+                      icon: Icons.edit_note_rounded,
+                    ).copyWith(
+                      counterStyle: TextStyle(
+                        fontFamily: 'DM Sans',
+                        fontSize: 11,
+                        color: AppColors.skMuted.withValues(alpha: 0.6),
+                      ),
+                    ),
               ),
               const SizedBox(height: 16),
 
@@ -394,14 +414,16 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isSelected ? AppColors.skRose : Colors.white12,
+                            color: isSelected
+                                ? AppColors.skRose
+                                : Colors.white12,
                             width: isSelected ? 2 : 1,
                           ),
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(25),
                           child: Image.network(
-                            url,
+                            ApiService.resolveImageUrl(url),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -437,12 +459,18 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                           color: color,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isSelected ? Colors.white : Colors.transparent,
+                            color: isSelected
+                                ? Colors.white
+                                : Colors.transparent,
                             width: 2,
                           ),
                         ),
                         child: isSelected
-                            ? const Icon(Icons.check, color: Colors.white, size: 16)
+                            ? const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 16,
+                              )
                             : null,
                       ),
                     );
@@ -463,7 +491,11 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                           _avatarUrlController.clear();
                         });
                       },
-                      icon: const Icon(Icons.refresh_rounded, color: AppColors.skRose, size: 16),
+                      icon: const Icon(
+                        Icons.refresh_rounded,
+                        color: AppColors.skRose,
+                        size: 16,
+                      ),
                       label: const Text(
                         'Hapus Foto (Gunakan Inisial)',
                         style: TextStyle(

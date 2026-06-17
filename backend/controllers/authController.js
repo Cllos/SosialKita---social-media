@@ -9,6 +9,7 @@ exports.register = async (req, res) => {
     // Cek validasi
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return error(res, 'Validasi gagal', 422, errors.array());
     }
 

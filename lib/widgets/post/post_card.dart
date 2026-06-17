@@ -8,6 +8,8 @@ import '../../models/user_model.dart';
 import '../../providers/post_provider.dart';
 import '../../providers/comment_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/notification_provider.dart';
+import '../../models/notification_model.dart';
 import '../../screens/profile/other_profile_screen.dart';
 import '../../screens/post/comment_sheet.dart';
 import '../../screens/post/share_sheet.dart';
@@ -66,6 +68,18 @@ class _PostCardState extends State<PostCard>
     final postProvider = context.read<PostProvider>();
     if (!postProvider.isLiked(widget.post.id, widget.currentUserId)) {
       postProvider.toggleLike(widget.post.id, widget.currentUserId);
+      if (widget.post.userId != widget.currentUserId) {
+        context.read<NotificationProvider>().addNotification(
+          NotificationModel(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            type: NotificationType.like,
+            fromUserId: widget.currentUserId,
+            postId: widget.post.id,
+            createdAt: DateTime.now(),
+            isRead: false,
+          ),
+        );
+      }
     }
     setState(() => _showHeartOverlay = true);
     _heartAnimController.forward(from: 0).then((_) {
@@ -78,9 +92,22 @@ class _PostCardState extends State<PostCard>
   }
 
   void _onTapLike() {
-    context
-        .read<PostProvider>()
-        .toggleLike(widget.post.id, widget.currentUserId);
+    final postProvider = context.read<PostProvider>();
+    final isCurrentlyLiked = postProvider.isLiked(widget.post.id, widget.currentUserId);
+    postProvider.toggleLike(widget.post.id, widget.currentUserId);
+
+    if (!isCurrentlyLiked && widget.post.userId != widget.currentUserId) {
+      context.read<NotificationProvider>().addNotification(
+        NotificationModel(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          type: NotificationType.like,
+          fromUserId: widget.currentUserId,
+          postId: widget.post.id,
+          createdAt: DateTime.now(),
+          isRead: false,
+        ),
+      );
+    }
   }
 
   @override

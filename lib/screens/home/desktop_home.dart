@@ -44,6 +44,7 @@ class _DesktopHomeState extends State<DesktopHome> {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final currentUser = authProvider.currentUser;
+    final selectedNav = authProvider.desktopSelectedIndex;
 
     if (currentUser == null) return const SizedBox.shrink();
 
@@ -53,68 +54,33 @@ class _DesktopHomeState extends State<DesktopHome> {
         children: [
           // ── Sidebar Kiri ──
           DesktopSidebar(
-            selectedIndex: _selectedNav,
+            selectedIndex: selectedNav,
             onItemTap: _handleNavTap,
           ),
 
           // ── Konten Tengah (berubah berdasarkan tab) ──
           Expanded(
-            child: _buildPageContent(currentUser),
+            child: _buildPageContent(currentUser, selectedNav),
           ),
 
           // ── Panel Kanan (hanya tampil di Beranda & Eksplorasi) ──
-          if (_selectedNav == 0 || _selectedNav == 2)
+          if (selectedNav == 0 || selectedNav == 2)
             DesktopRightPanel(currentUserId: currentUser.id),
         ],
       ),
     );
   }
 
-  /// Handler navigasi sidebar
   void _handleNavTap(int idx) {
-    switch (idx) {
-      case 0:
-        // Beranda — tetap di sini
-        setState(() => _selectedNav = 0);
-        break;
-      case 1:
-        // Cari — navigasi ke DesktopSearchPage (punya sidebar sendiri)
-        setState(() => _selectedNav = 1);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const DesktopSearchPage()),
-        ).then((_) {
-          if (mounted) setState(() => _selectedNav = 0);
-        });
-        break;
-      case 2:
-        // Eksplorasi — tampil inline
-        setState(() => _selectedNav = 2);
-        break;
-      case 3:
-        // Pesan — tampil inline
-        setState(() => _selectedNav = 3);
-        break;
-      case 4:
-        // Tersimpan — tampil inline
-        setState(() => _selectedNav = 4);
-        break;
-      case 5:
-        // Profil — navigasi ke DesktopProfile (punya sidebar sendiri)
-        setState(() => _selectedNav = 5);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const DesktopProfile()),
-        ).then((_) {
-          if (mounted) setState(() => _selectedNav = 0);
-        });
-        break;
-    }
+    context.read<AuthProvider>().setDesktopSelectedIndex(idx);
   }
 
   /// Pilih widget konten berdasarkan tab aktif
-  Widget _buildPageContent(dynamic currentUser) {
-    switch (_selectedNav) {
+  Widget _buildPageContent(dynamic currentUser, int selectedNav) {
+    switch (selectedNav) {
+      case 1:
+        // Cari — pencarian inline
+        return const DesktopSearchPage(isInline: true);
       case 2:
         // Eksplorasi — semua post (tanpa filter following)
         return const DesktopExplorePage();
@@ -124,6 +90,9 @@ class _DesktopHomeState extends State<DesktopHome> {
       case 4:
         // Tersimpan — post yang disimpan
         return const DesktopSavedPage();
+      case 5:
+        // Profil — profil sendiri
+        return const DesktopProfile(isInline: true);
       case 0:
       default:
         // Beranda — feed utama

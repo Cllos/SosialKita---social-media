@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../services/api_service.dart';
 
 /// SKAvatar — Avatar lingkaran dengan gradient ring (opsional)
 /// dan fallback initials jika tidak ada gambar
@@ -83,7 +84,7 @@ class SKAvatar extends StatelessWidget {
 
     if (isNetwork) {
       return Image.network(
-        imageUrl!,
+        ApiService.resolveImageUrl(imageUrl!),
         width: size,
         height: size,
         fit: BoxFit.cover,

@@ -26,9 +26,21 @@ class ApiService {
   /// menjadi URL lengkap absolut (misal: "http://192.168.1.5:5000/uploads/filename.jpg")
   static String resolveImageUrl(String? path) {
     if (path == null || path.isEmpty) return '';
-    if (path.startsWith('http') ||
-        path.startsWith('blob:') ||
-        path.startsWith('data:')) {
+    if (path.startsWith('blob:') || path.startsWith('data:')) {
+      return path;
+    }
+    if (path.startsWith('http') && path.contains('/uploads/')) {
+      final index = path.indexOf('/uploads/');
+      final relativePath = path.substring(index + 1); // "uploads/..."
+      final cleanPath = '/$relativePath';
+      final serverUrl = baseUrl.replaceAll('/api/v1', '');
+      return '$serverUrl$cleanPath';
+    }
+    if (path.startsWith('http')) {
+      if (kIsWeb) {
+        final encodedUrl = Uri.encodeComponent(path);
+        return '$baseUrl/proxy?url=$encodedUrl';
+      }
       return path;
     }
     final cleanPath = path.startsWith('/') ? path : '/$path';
@@ -130,7 +142,9 @@ class ApiService {
                 uploadBytes = response.bodyBytes;
               }
             } catch (e) {
-              debugPrint('Error fetching bytes from web filePath ($filePath): $e');
+              debugPrint(
+                'Error fetching bytes from web filePath ($filePath): $e',
+              );
             }
           }
           if (uploadBytes != null) {

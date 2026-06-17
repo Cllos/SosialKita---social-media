@@ -20,8 +20,9 @@ import '../../widgets/post/post_image.dart';
 /// Menampilkan sidebar kiri + konten profil di tengah
 class DesktopProfile extends StatefulWidget {
   final String? userId;
+  final bool isInline;
 
-  const DesktopProfile({super.key, this.userId});
+  const DesktopProfile({super.key, this.userId, this.isInline = false});
 
   @override
   State<DesktopProfile> createState() => _DesktopProfileState();
@@ -89,15 +90,28 @@ class _DesktopProfileState extends State<DesktopProfile>
             .toList()
         : <PostModel>[];
 
+    if (widget.isInline) {
+      return _buildProfileContent(
+        context,
+        user,
+        userPosts,
+        savedPosts,
+        isOwn,
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.skDark,
       body: Row(
         children: [
           // ── Sidebar Kiri ──
           DesktopSidebar(
-            selectedIndex: 6, // Index profil di sidebar
+            selectedIndex: 5, // Index profil di sidebar
             onItemTap: (idx) {
-              // TODO: navigasi ke halaman lain
+              if (idx != 5) {
+                context.read<AuthProvider>().setDesktopSelectedIndex(idx);
+                Navigator.popUntil(context, (route) => route.isFirst);
+              }
             },
           ),
 

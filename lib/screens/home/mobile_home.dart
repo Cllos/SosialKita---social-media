@@ -83,65 +83,87 @@ class _MobileHomeState extends State<MobileHome> {
 
         // ── Content ──
         Expanded(
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              // Stories
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: StoryRow(
-                    currentUserId: currentUser.id,
-                    following: currentUser.following,
-                  ),
-                ),
+          child: RefreshIndicator(
+            color: AppColors.skRose,
+            backgroundColor: AppColors.skDark2,
+            onRefresh: () async {
+              await Future.wait([
+                context.read<PostProvider>().fetchPosts(),
+                context.read<StoryProvider>().fetchStories(),
+                context.read<ChatProvider>().fetchConversations(),
+              ]);
+            },
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
               ),
-
-              // Divider
-              SliverToBoxAdapter(
-                child: Container(
-                  height: 1,
-                  color: Colors.white.withOpacity(0.05),
-                ),
-              ),
-
-              // Feed
-              if (feed.isEmpty)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.feed_outlined,
-                          size: 56,
-                          color: AppColors.skMuted.withOpacity(0.3),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Belum ada postingan',
-                          style: TextStyle(
-                            fontFamily: 'Syne',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.skMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              else
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => PostCard(
-                      post: feed[index],
+              slivers: [
+                // Stories
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: StoryRow(
                       currentUserId: currentUser.id,
+                      following: currentUser.following,
                     ),
-                    childCount: feed.length,
                   ),
                 ),
-            ],
+
+                // Divider
+                SliverToBoxAdapter(
+                  child: Container(
+                    height: 1,
+                    color: Colors.white.withOpacity(0.05),
+                  ),
+                ),
+
+                // Feed
+                if (feed.isEmpty)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.feed_outlined,
+                            size: 56,
+                            color: AppColors.skMuted.withOpacity(0.3),
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'Belum ada postingan',
+                            style: TextStyle(
+                              fontFamily: 'Syne',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.skMuted,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tarik ke bawah untuk memuat ulang',
+                            style: TextStyle(
+                              fontFamily: 'DM Sans',
+                              fontSize: 12,
+                              color: AppColors.skMuted.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => PostCard(
+                        post: feed[index],
+                        currentUserId: currentUser.id,
+                      ),
+                      childCount: feed.length,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ],

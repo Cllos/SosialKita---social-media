@@ -63,7 +63,7 @@ exports.updateProfile = async (req, res) => {
 
     // Jika ada upload avatar
     if (req.file) {
-      const avatarUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+      const avatarUrl = `uploads/${req.file.filename}`;
       user.avatar_url = avatarUrl;
     }
 
@@ -155,5 +155,24 @@ exports.getFollowing = async (req, res) => {
   } catch (err) {
     console.error('Get following error:', err);
     return error(res, 'Gagal mengambil daftar following');
+  }
+};
+
+// GET /id/:id — Profil user by ID
+exports.getProfileById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findByPk(id, {
+      attributes: { exclude: ['password'] }
+    });
+
+    if (!user) {
+      return error(res, 'User tidak ditemukan', 404);
+    }
+
+    return success(res, user, 'User berhasil diambil');
+  } catch (err) {
+    console.error('Get profile by ID error:', err);
+    return error(res, 'Gagal mengambil profil');
   }
 };

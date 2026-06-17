@@ -9,6 +9,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/story_provider.dart';
 import '../../widgets/common/sk_button.dart';
 import '../../widgets/common/sk_text_field.dart';
+import '../../services/api_service.dart';
 
 /// AddStorySheet — Bottom sheet untuk membuat story baru
 class AddStorySheet extends StatefulWidget {
@@ -130,7 +131,7 @@ class _AddStorySheetState extends State<AddStorySheet> {
     final isNetwork = url.startsWith('http') || url.startsWith('blob:') || kIsWeb;
     if (isNetwork) {
       return Image.network(
-        url,
+        ApiService.resolveImageUrl(url),
         fit: BoxFit.cover,
         errorBuilder: (_, _, _) => const Center(
           child: Icon(
@@ -388,7 +389,7 @@ class _AddStorySheetState extends State<AddStorySheet> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(7),
                     child: Image.network(
-                      url,
+                      ApiService.resolveImageUrl(url),
                       fit: BoxFit.cover,
                     ),
                   ),

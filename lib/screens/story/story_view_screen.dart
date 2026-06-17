@@ -13,6 +13,9 @@ import '../../widgets/common/sk_avatar.dart';
 import '../../widgets/story/add_story_sheet.dart';
 import '../profile/profile_screen.dart';
 import '../../providers/chat_provider.dart';
+import '../../services/api_service.dart';
+import '../../providers/notification_provider.dart';
+import '../../models/notification_model.dart';
 
 /// StoryViewScreen — Penayang cerita (story viewer) full-screen ala Instagram
 class StoryViewScreen extends StatefulWidget {
@@ -209,7 +212,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
     final isNetwork = story.mediaUrl.startsWith('http') || story.mediaUrl.startsWith('blob:') || kIsWeb;
     if (isNetwork) {
       return Image.network(
-        story.mediaUrl,
+        ApiService.resolveImageUrl(story.mediaUrl),
         fit: BoxFit.cover,
         loadingBuilder: (context, child, progress) {
           if (progress == null) {
@@ -717,6 +720,20 @@ class _StoryViewScreenState extends State<StoryViewScreen>
               story.userId,
               'Membalas Cerita Anda: "$msg"',
             );
+
+            // Tambah notifikasi balasan cerita jika bukan cerita sendiri
+            if (story.userId != currentUser.id) {
+              context.read<NotificationProvider>().addNotification(
+                NotificationModel(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  type: NotificationType.comment,
+                  fromUserId: currentUser.id,
+                  commentText: 'Membalas cerita Anda: "$msg"',
+                  createdAt: DateTime.now(),
+                  isRead: false,
+                ),
+              );
+            }
 
             replyController.clear();
             FocusScope.of(context).unfocus(); // Sembunyikan keyboard

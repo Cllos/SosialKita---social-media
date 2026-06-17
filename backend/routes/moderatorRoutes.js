@@ -24,4 +24,10 @@ router.put('/users/:id/deactivate', moderatorController.deactivateUser);
 // GET /stats — Statistik
 router.get('/stats', moderatorController.getStats);
 
+// GET /comments — Semua komentar (untuk moderasi)
+router.get('/comments', moderatorController.getAllComments);
+
+// DELETE /users/:id — Hapus user (bukan moderator)
+router.delete('/users/:id', moderatorController.deleteUser);
+
 module.exports = router;

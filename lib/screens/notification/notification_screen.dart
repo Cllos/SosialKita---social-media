@@ -4,8 +4,11 @@ import '../../core/theme/app_colors.dart';
 import '../../core/utils/dummy_data.dart';
 import '../../core/utils/time_ago.dart';
 import '../../models/notification_model.dart';
+import '../../models/user_model.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/post_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
 import '../../widgets/post/post_card.dart';
 
@@ -104,8 +107,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 final notification = notifications[index];
                 final fromUser = _getNotificationUser(notification.fromUserId);
 
-                if (fromUser == null) return const SizedBox.shrink();
-
                 return InkWell(
                   onTap: () {
                     if (notification.postId != null) {
@@ -160,7 +161,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   ],
                                 ),
                               ),
-                              if (notification.type == NotificationType.comment && notification.commentText != null)
+                              if ((notification.type == NotificationType.comment || notification.type == NotificationType.message) && notification.commentText != null)
                                 Container(
                                   margin: const EdgeInsets.only(top: 6),
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -220,15 +221,55 @@ class _NotificationScreenState extends State<NotificationScreen> {
         return 'mengomentari postingan Anda.';
       case NotificationType.follow:
         return 'mulai mengikuti Anda.';
+      case NotificationType.message:
+        return 'mengirim pesan kepada Anda.';
     }
   }
 
+  final Set<String> _pendingFetches = {};
+
+  void _triggerUserFetch(String userId) {
+    if (_pendingFetches.contains(userId)) return;
+    _pendingFetches.add(userId);
+
+    Future.microtask(() async {
+      try {
+        if (mounted) {
+          await context.read<UserProvider>().fetchUserById(userId);
+        }
+      } catch (e) {
+        debugPrint('Error fetching user $userId: $e');
+      }
+    });
+  }
+
   // Helper untuk mengambil detail user
-  dynamic _getNotificationUser(String userId) {
+  UserModel _getNotificationUser(String userId) {
+    final auth = context.read<AuthProvider>();
+    if (auth.currentUser?.id == userId) {
+      return auth.currentUser!;
+    }
+
     try {
       return dummyUsers.firstWhere((u) => u.id == userId);
     } catch (_) {
-      return null;
+      // Trigger background fetch if not found
+      _triggerUserFetch(userId);
+
+      // Return a fallback model so the notification still displays gracefully
+      return UserModel(
+        id: userId,
+        username: 'user_$userId',
+        displayName: 'Pengguna SosialKita',
+        email: '',
+        password: '',
+        bio: '',
+        avatarUrl: '',
+        avatarInitials: 'U',
+        avatarColor: Colors.grey,
+        role: 'user',
+        joinedAt: DateTime.now(),
+      );
     }
   }
 
@@ -242,6 +283,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     showDialog(
       context: context,
       builder: (context) {
+        final currentUserId = context.read<AuthProvider>().currentUser?.id ?? '1';
         return Dialog(
           backgroundColor: AppColors.skDark2,
           insetPadding: const EdgeInsets.all(16),
@@ -272,7 +314,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 child: SingleChildScrollView(
                   child: PostCard(
                     post: post,
-                    currentUserId: 'u1', // Default dummy user login
+                    currentUserId: currentUserId,
                   ),
                 ),
               ),

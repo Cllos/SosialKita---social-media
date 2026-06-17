@@ -26,6 +26,43 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+// ── Image Proxy (to bypass CORS on Web for seed images) ──
+const https = require('https');
+const http = require('http');
+
+app.get('/api/v1/proxy', (req, res) => {
+  const imageUrl = req.query.url;
+  if (!imageUrl) {
+    return res.status(400).json({ success: false, message: 'Missing url parameter' });
+  }
+  const parsedUrl = new URL(imageUrl);
+  const client = parsedUrl.protocol === 'https:' ? https : http;
+  
+  client.get(imageUrl, (response) => {
+    if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+      // Handle redirects (e.g. picsum.photos redirecting to fastly.jsdelivr.net)
+      client.get(response.headers.location, (redirectRes) => {
+        if (redirectRes.headers['content-type']) {
+          res.setHeader('Content-Type', redirectRes.headers['content-type']);
+        }
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        redirectRes.pipe(res);
+      }).on('error', (err) => {
+        res.status(500).json({ success: false, message: 'Failed to fetch redirect image', error: err.message });
+      });
+      return;
+    }
+    
+    if (response.headers['content-type']) {
+      res.setHeader('Content-Type', response.headers['content-type']);
+    }
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    response.pipe(res);
+  }).on('error', (err) => {
+    res.status(500).json({ success: false, message: 'Failed to fetch image', error: err.message });
+  });
+});
+
 // ── Routes ──
 app.use('/api/v1', routes);
 

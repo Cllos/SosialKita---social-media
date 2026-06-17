@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../screens/post/create_post_screen.dart';
+import '../../screens/notification/notification_screen.dart';
+import '../../providers/auth_provider.dart';
 
 /// DesktopSidebar — Navigasi sidebar kiri untuk layout desktop
 /// Menggunakan InkWell untuk kompatibilitas web yang lebih baik.
@@ -88,12 +91,38 @@ class DesktopSidebar extends StatelessWidget {
 
           const Spacer(),
 
-          // ── Settings ──
+          // ── Notification ──
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.notifications_none_rounded,
+                  color: AppColors.skMuted,
+                  size: 22,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // ── Logout ──
           _NavItem(
-            icon: Icons.settings_outlined,
-            label: 'Pengaturan',
+            icon: Icons.logout_rounded,
+            label: 'Logout',
             isActive: false,
-            onTap: () {},
+            onTap: () {
+              context.read<AuthProvider>().logout();
+            },
           ),
           const SizedBox(height: 8),
 

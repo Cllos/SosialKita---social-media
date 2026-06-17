@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../services/api_service.dart';
 
 class PostImage extends StatelessWidget {
   final String imageUrl;
@@ -23,11 +24,12 @@ class PostImage extends StatelessWidget {
       return _buildPlaceholder();
     }
 
-    final isNetwork = imageUrl.startsWith('http') || imageUrl.startsWith('blob:') || kIsWeb;
+    final isNetwork =
+        imageUrl.startsWith('http') || imageUrl.startsWith('blob:') || kIsWeb;
 
     if (isNetwork) {
       return Image.network(
-        imageUrl,
+        ApiService.resolveImageUrl(imageUrl),
         width: width,
         height: height,
         fit: fit,
@@ -41,7 +43,7 @@ class PostImage extends StatelessWidget {
               child: CircularProgressIndicator(
                 value: loadingProgress.expectedTotalBytes != null
                     ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
+                          loadingProgress.expectedTotalBytes!
                     : null,
                 color: AppColors.skRose,
                 strokeWidth: 2,

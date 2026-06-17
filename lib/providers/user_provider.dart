@@ -97,6 +97,25 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  /// Ambil profil user secara asinkron dari backend berdasarkan ID
+  Future<UserModel?> fetchUserById(String userId) async {
+    try {
+      final res = await ApiService.get('/users/id/$userId');
+      if (res.statusCode == 200) {
+        final body = jsonDecode(res.body);
+        if (body['success'] == true) {
+          final data = body['data'];
+          upsertUserFromBackend(data, resolveUrl: ApiService.resolveImageUrl);
+          notifyListeners();
+          return getUserById(userId);
+        }
+      }
+    } catch (e) {
+      debugPrint('Fetch User By ID Error: $e');
+    }
+    return null;
+  }
+
   /// Memicu fetch profil user secara asinkron dari backend
   Future<UserModel?> fetchUserProfile(String username) async {
     try {

@@ -16,14 +16,7 @@ router.post('/register', [
     .isEmail().withMessage('Email tidak valid')
     .normalizeEmail(),
   body('password')
-    .isLength({ min: 6 }).withMessage('Password minimal 6 karakter'),
-  body('password_confirmation')
-    .custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error('Konfirmasi password tidak cocok');
-      }
-      return true;
-    })
+    .isLength({ min: 6 }).withMessage('Password minimal 6 karakter')
 ], authController.register);
 
 // POST /login

@@ -5,8 +5,10 @@ import '../../core/theme/app_colors.dart';
 import '../../core/utils/dummy_data.dart';
 import '../../models/post_model.dart';
 import '../../models/user_model.dart';
+import '../../models/notification_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/chat_provider.dart';
+import '../../providers/notification_provider.dart';
 import '../../widgets/common/sk_avatar.dart';
 
 /// ShareSheet — Lembar bagikan postingan bergaya modern
@@ -206,6 +208,18 @@ class ShareSheet extends StatelessWidget {
     final msgText = 'Hei! Lihat postingan dari @$authorUsername ini: "${post.caption}"';
 
     chatProvider.sendMessage(conv.id, currentUserId, friend.id, msgText);
+
+    // Tambah notifikasi pesan baru
+    context.read<NotificationProvider>().addNotification(
+      NotificationModel(
+        id: 'share_${DateTime.now().millisecondsSinceEpoch}',
+        type: NotificationType.message,
+        fromUserId: currentUserId,
+        commentText: msgText,
+        createdAt: DateTime.now(),
+        isRead: false,
+      ),
+    );
 
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(

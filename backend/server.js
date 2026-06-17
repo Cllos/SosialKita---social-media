@@ -9,8 +9,8 @@ async function startServer() {
     await sequelize.authenticate();
     console.log('✅ Database MySQL terhubung');
 
-    // Sync semua model ke database (alter:true agar tidak hapus data)
-    await sequelize.sync({ alter: true });
+    // Sync model ke database (tanpa alter agar tidak duplikasi index)
+    await sequelize.sync();
     console.log('✅ Database sync selesai');
 
     app.listen(PORT, () => {

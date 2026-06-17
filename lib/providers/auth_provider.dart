@@ -14,6 +14,16 @@ class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
   final _storage = LocalStorageService.instance;
 
+  int _desktopSelectedIndex = 0;
+  int get desktopSelectedIndex => _desktopSelectedIndex;
+
+  void setDesktopSelectedIndex(int idx) {
+    if (_desktopSelectedIndex != idx) {
+      _desktopSelectedIndex = idx;
+      notifyListeners();
+    }
+  }
+
   UserModel? get currentUser => _currentUser;
   bool get isLoggedIn => _isLoggedIn;
   bool get isLoading => _isLoading;
@@ -83,7 +93,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Register ke Backend
-  Future<bool> register(
+  Future<String?> register(
     String displayName,
     String username,
     String email,
@@ -98,6 +108,7 @@ class AuthProvider extends ChangeNotifier {
         'username': username,
         'email': email,
         'password': password,
+        'password_confirmation': password,
       });
 
       final body = jsonDecode(res.body);
@@ -112,7 +123,22 @@ class AuthProvider extends ChangeNotifier {
 
         await _storage.saveSession(_currentUser!.id);
         notifyListeners();
-        return true;
+        return null; // success
+      } else {
+        if (body['errors'] is List && (body['errors'] as List).isNotEmpty) {
+          final errList = body['errors'] as List;
+          final firstErr = errList.first;
+          if (firstErr is Map && firstErr['msg'] != null) {
+            _isLoading = false;
+            notifyListeners();
+            return firstErr['msg'].toString();
+          }
+        }
+        if (body['message'] != null) {
+          _isLoading = false;
+          notifyListeners();
+          return body['message'].toString();
+        }
       }
     } catch (e) {
       debugPrint('Register Error: $e');
@@ -120,7 +146,7 @@ class AuthProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
-    return false;
+    return 'Gagal melakukan registrasi, coba lagi nanti';
   }
 
   /// Logout dari Backend

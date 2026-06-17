@@ -135,3 +135,50 @@ exports.getStats = async (req, res) => {
     return error(res, 'Gagal mengambil statistik');
   }
 };
+
+// GET /comments — Semua komentar (untuk moderasi)
+exports.getAllComments = async (req, res) => {
+  try {
+    const comments = await Comment.findAll({
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'username', 'display_name', 'avatar_url']
+        },
+        {
+          model: Post,
+          attributes: ['id', 'caption', 'image_url']
+        }
+      ],
+      order: [['created_at', 'DESC']]
+    });
+
+    return success(res, comments, 'Semua komentar berhasil diambil');
+  } catch (err) {
+    console.error('Moderator get comments error:', err);
+    return error(res, 'Gagal mengambil komentar');
+  }
+};
+
+// DELETE /users/:id — Hapus user (bukan moderator)
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findByPk(id);
+    if (!user) {
+      return error(res, 'User tidak ditemukan', 404);
+    }
+
+    if (user.role === 'moderator') {
+      return error(res, 'Tidak bisa menghapus sesama moderator', 403);
+    }
+
+    await user.destroy();
+    return success(res, null, 'User berhasil dihapus oleh moderator');
+  } catch (err) {
+    console.error('Moderator delete user error:', err);
+    return error(res, 'Gagal menghapus user');
+  }
+};

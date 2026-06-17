@@ -17,7 +17,8 @@ import '../../widgets/post/post_image.dart';
 /// DesktopSearchPage — Halaman pencarian full-page untuk desktop
 /// Layout: sidebar kiri + konten pencarian di tengah
 class DesktopSearchPage extends StatefulWidget {
-  const DesktopSearchPage({super.key});
+  final bool isInline;
+  const DesktopSearchPage({super.key, this.isInline = false});
 
   @override
   State<DesktopSearchPage> createState() => _DesktopSearchPageState();
@@ -65,6 +66,10 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.isInline) {
+      return _buildSearchContent();
+    }
+
     return Scaffold(
       backgroundColor: AppColors.skDark,
       body: Row(
@@ -73,7 +78,10 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
           DesktopSidebar(
             selectedIndex: 1, // Index Cari
             onItemTap: (idx) {
-              if (idx != 1) Navigator.pop(context);
+              if (idx != 1) {
+                context.read<AuthProvider>().setDesktopSelectedIndex(idx);
+                Navigator.popUntil(context, (route) => route.isFirst);
+              }
             },
           ),
 
@@ -98,26 +106,28 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
               // ── Header: Back + Search Bar ──
               Row(
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.06),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.08),
+                  if (!widget.isInline) ...[
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.06),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.08),
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_rounded,
+                          size: 18,
+                          color: AppColors.skWhite,
                         ),
                       ),
-                      child: const Icon(
-                        Icons.arrow_back_rounded,
-                        size: 18,
-                        color: AppColors.skWhite,
-                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
+                    const SizedBox(width: 12),
+                  ],
                   Expanded(child: _buildSearchBar()),
                 ],
               ),

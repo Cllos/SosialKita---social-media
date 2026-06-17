@@ -744,12 +744,97 @@ class ChatProvider extends ChangeNotifier {
 
 ### 13. ROLE: MODERATOR
 
-**ModeratorDashboard** (hanya bisa diakses jika role = 'moderator'):
-- Tampilkan semua post (bukan hanya following)
-- Statistik: total user, total post, total komentar (dari data dummy)
-- Fitur hapus post: swipe atau tap menu → konfirmasi → hapus dari list dummy
-- Fitur hapus komentar
-- Tampilkan badge "MODERATOR" di AppBar
+**ModeratorDashboard** — layout web/desktop penuh dengan sidebar navigasi kiri. Hanya bisa diakses jika `currentUser.role == 'moderator'`. Referensi desain: lihat dashboard interaktif yang sudah dibuat.
+
+**Layout struktur:**
+```
+[TopBar: Logo + badge MOD + tombol Keluar]
+[Sidebar kiri 200px] | [Konten utama flex:1]
+```
+
+**Sidebar navigasi (NavigationRail atau Column):**
+- Avatar + nama moderator + label "Moderator resmi"
+- Menu: Dashboard, Pengguna, Postingan, Komentar, Chat/DM, Laporan, Pengaturan
+- Item aktif: warna rose + border-left highlight
+
+**5 halaman dalam ModeratorDashboard (gunakan IndexedStack atau PageView):**
+
+**Halaman 1 — Dashboard:**
+- 4 stat card horizontal: Total Pengguna, Total Postingan, Total Komentar, Total Percakapan DM
+- Setiap card punya ikon berwarna, angka besar, label, dan tren singkat
+- Tabel log aktivitas terbaru: kolom Waktu, Pengguna, Aksi (chip berwarna), Detail
+
+**Halaman 2 — Kelola Pengguna (CRUD Lengkap):**
+- Search bar filter real-time by username/nama/email
+- Tabel kolom: Avatar+Nama, Email, Role (chip), Status (chip), Aksi
+- Tombol "Tambah Pengguna" → Dialog/Modal form:
+  - Field: Nama lengkap, Username, Email, Role (dropdown), Status (dropdown)
+  - Validasi semua field wajib diisi
+  - Simpan → tambah ke dummyUsers
+- Tombol Edit per baris → isi form dengan data existing → update
+- Tombol Hapus per baris → konfirmasi dialog → hapus dari dummyUsers
+- Moderator tidak bisa dihapus (hide tombol hapus untuk role moderator)
+
+**Halaman 3 — Kelola Postingan:**
+- Search bar filter by caption/username
+- Tabel kolom: Thumbnail emoji + caption, Username, Likes, Komentar, Aksi
+- Tombol Hapus per baris → hapus dari dummyPosts
+
+**Halaman 4 — Kelola Komentar:**
+- Search bar filter by isi komentar/username
+- Tabel kolom: Teks komentar + waktu, Username, Di postingan, Aksi
+- Tombol Hapus per baris → hapus dari dummyComments
+
+**Halaman 5 — Monitor Chat/DM:**
+- List semua percakapan: avatar, "user_a → user_b", preview pesan terakhir, waktu, badge unread
+- Tap item → tampilkan detail isi percakapan di bawah list
+- Bubble chat: pesan kiri/kanan dibedakan warna
+- Tombol "Hapus percakapan" untuk konten yang melanggar aturan
+
+**Widget pendukung:**
+```dart
+// Stat card
+class ModStatCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+  final String value;
+  final String label;
+  final String delta;
+  // ...
+}
+
+// Form dialog tambah/edit user
+class UserFormDialog extends StatefulWidget { ... }
+
+// Baris tabel dengan aksi
+class ModTableRow extends StatelessWidget { ... }
+```
+
+**State management moderator:**
+```dart
+class ModeratorProvider extends ChangeNotifier {
+  // Mirror dari provider utama tapi dengan akses penuh
+  List<UserModel> get allUsers => List.from(dummyUsers);
+  List<PostModel> get allPosts => List.from(dummyPosts);
+  List<CommentModel> get allComments => List.from(dummyComments);
+  List<DmConversation> get allConversations => List.from(dummyConversations);
+
+  void deleteAnyPost(String postId) { ... notifyListeners(); }
+  void deleteAnyComment(String commentId) { ... notifyListeners(); }
+  void deleteAnyConversation(String conversationId) { ... notifyListeners(); }
+  void addUser(UserModel user) { ... notifyListeners(); }
+  void updateUser(UserModel user) { ... notifyListeners(); }
+  void deleteUser(String userId) { ... notifyListeners(); }
+  void toggleUserStatus(String userId) { ... notifyListeners(); }
+
+  // Statistik realtime
+  int get totalUsers => allUsers.length;
+  int get totalPosts => allPosts.length;
+  int get totalComments => allComments.length;
+  int get totalConversations => allConversations.length;
+}
+```
 
 ---
 

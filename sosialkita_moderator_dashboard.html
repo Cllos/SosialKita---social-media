@@ -1,0 +1,520 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.mod-wrap{width:100%;min-height:600px;background:var(--color-background-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.mod-topbar{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.mod-logo{font-size:15px;font-weight:500;color:var(--color-text-primary);display:flex;align-items:center;gap:8px}
+.mod-logo i{font-size:18px;color:#E24B4A}
+.mod-badge{background:#FAEEDA;color:#854F0B;font-size:11px;font-weight:500;padding:3px 10px;border-radius:var(--border-radius-md);display:flex;align-items:center;gap:4px}
+.mod-layout{display:flex;min-height:560px}
+.mod-sidebar{width:180px;flex-shrink:0;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);padding:16px 0}
+.mod-greeting{padding:0 14px 16px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:12px}
+.mod-av{width:36px;height:36px;border-radius:50%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#854F0B;margin-bottom:8px}
+.mod-gname{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.mod-grole{font-size:11px;color:var(--color-text-secondary)}
+.mod-nav-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent;transition:all .1s}
+.mod-nav-item:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.mod-nav-item.active{background:var(--color-background-secondary);color:#E24B4A;border-left-color:#E24B4A;font-weight:500}
+.mod-nav-item i{font-size:16px}
+.mod-nav-section{font-size:10px;font-weight:500;color:var(--color-text-tertiary);padding:12px 14px 4px;text-transform:uppercase;letter-spacing:.06em}
+.mod-content{flex:1;padding:20px;overflow:auto;min-width:0}
+.page{display:none}
+.page.active{display:block}
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px}
+.stat-icon{width:32px;height:32px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:16px}
+.stat-val{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.stat-label{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.stat-delta{font-size:11px;margin-top:4px}
+
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--border-radius-md);font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-danger{background:#FCEBEB;border-color:#F09595;color:#A32D2D}
+.btn-danger:hover{background:#F7C1C1}
+.btn-primary{background:#E24B4A;border-color:#E24B4A;color:#fff}
+.btn-primary:hover{background:#A32D2D;border-color:#A32D2D}
+.btn-sm{padding:4px 8px;font-size:11px}
+
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{text-align:left;padding:8px 10px;font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.data-table td{padding:9px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--color-background-secondary)}
+
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500}
+.chip-user{background:#E6F1FB;color:#185FA5}
+.chip-mod{background:#FAEEDA;color:#854F0B}
+.chip-active{background:#EAF3DE;color:#3B6D11}
+.chip-inactive{background:#F1EFE8;color:#5F5E5A}
+
+.avatar-cell{display:flex;align-items:center;gap:8px}
+.av-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.av-blue{background:#E6F1FB;color:#185FA5}
+.av-pink{background:#FBEAF0;color:#993556}
+.av-green{background:#EAF3DE;color:#3B6D11}
+.av-amber{background:#FAEEDA;color:#854F0B}
+.av-teal{background:#E1F5EE;color:#0F6E56}
+.av-red{background:#FCEBEB;color:#A32D2D}
+
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 10px;margin-bottom:12px}
+.search-bar i{font-size:15px;color:var(--color-text-tertiary)}
+.search-bar input{border:none;background:transparent;font-size:13px;color:var(--color-text-primary);outline:none;flex:1;font-family:var(--font-sans)}
+
+.post-thumb{width:38px;height:38px;border-radius:var(--border-radius-md);object-fit:cover;background:var(--color-background-secondary);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+
+.modal-backdrop{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:20px;width:340px;max-width:90%}
+.modal-title{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--color-text-primary)}
+.form-row{margin-bottom:10px}
+.form-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
+.form-input{width:100%;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary);font-family:var(--font-sans);outline:none}
+.form-input:focus{border-color:#E24B4A}
+.form-select{width:100%;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary);font-family:var(--font-sans);outline:none}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+
+.toast{position:fixed;bottom:16px;right:16px;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:10px 14px;font-size:13px;color:var(--color-text-primary);box-shadow:none;display:none;z-index:200;align-items:center;gap:8px}
+.toast.show{display:flex}
+.toast i{font-size:16px}
+
+.dm-list{display:flex;flex-direction:column;gap:0}
+.dm-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer;border-radius:0}
+.dm-item:hover{background:var(--color-background-secondary)}
+.dm-meta{flex:1;min-width:0}
+.dm-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.dm-preview{font-size:12px;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm-time{font-size:11px;color:var(--color-text-tertiary)}
+.unread-dot{width:7px;height:7px;border-radius:50%;background:#E24B4A;flex-shrink:0}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--color-text-secondary)}
+.empty-state i{font-size:32px;margin-bottom:10px;display:block;color:var(--color-text-tertiary)}
+</style>
+
+<div class="mod-wrap">
+  <div class="mod-topbar">
+    <div class="mod-logo">
+      <i class="ti ti-shield-check" aria-hidden="true"></i>
+      Panel Moderator — SosialKita
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="mod-badge"><i class="ti ti-shield" style="font-size:12px" aria-hidden="true"></i> MOD</div>
+      <button class="btn btn-sm" style="color:#A32D2D;border-color:#F09595" onclick="showToast('Logout berhasil','ti-logout')"><i class="ti ti-logout" aria-hidden="true"></i> Keluar</button>
+    </div>
+  </div>
+
+  <div class="mod-layout">
+    <div class="mod-sidebar">
+      <div class="mod-greeting">
+        <div class="mod-av">AS</div>
+        <div class="mod-gname">Admin SosialKita</div>
+        <div class="mod-grole">Moderator resmi</div>
+      </div>
+
+      <div class="mod-nav-section">Menu</div>
+      <div class="mod-nav-item active" onclick="switchPage('dashboard',this)"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+      <div class="mod-nav-item" onclick="switchPage('users',this)"><i class="ti ti-users" aria-hidden="true"></i> Pengguna</div>
+      <div class="mod-nav-item" onclick="switchPage('posts',this)"><i class="ti ti-photo" aria-hidden="true"></i> Postingan</div>
+      <div class="mod-nav-item" onclick="switchPage('comments',this)"><i class="ti ti-message" aria-hidden="true"></i> Komentar</div>
+      <div class="mod-nav-item" onclick="switchPage('dm',this)"><i class="ti ti-brand-telegram" aria-hidden="true"></i> Chat / DM</div>
+      <div class="mod-nav-section">Sistem</div>
+      <div class="mod-nav-item" onclick="showToast('Fitur laporan segera hadir','ti-flag')"><i class="ti ti-flag" aria-hidden="true"></i> Laporan</div>
+      <div class="mod-nav-item" onclick="showToast('Pengaturan segera hadir','ti-settings')"><i class="ti ti-settings" aria-hidden="true"></i> Pengaturan</div>
+    </div>
+
+    <div class="mod-content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#E6F1FB"><i class="ti ti-users" style="color:#185FA5" aria-hidden="true"></i></div>
+            <div class="stat-val" id="stat-users">6</div>
+            <div class="stat-label">Total pengguna</div>
+            <div class="stat-delta" style="color:#3B6D11"><i class="ti ti-trending-up" aria-hidden="true"></i> +2 minggu ini</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#FBEAF0"><i class="ti ti-photo" style="color:#993556" aria-hidden="true"></i></div>
+            <div class="stat-val" id="stat-posts">5</div>
+            <div class="stat-label">Total postingan</div>
+            <div class="stat-delta" style="color:#3B6D11"><i class="ti ti-trending-up" aria-hidden="true"></i> +5 hari ini</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#EAF3DE"><i class="ti ti-message" style="color:#3B6D11" aria-hidden="true"></i></div>
+            <div class="stat-val" id="stat-comments">8</div>
+            <div class="stat-label">Total komentar</div>
+            <div class="stat-delta" style="color:#3B6D11"><i class="ti ti-trending-up" aria-hidden="true"></i> +8 hari ini</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#FAEEDA"><i class="ti ti-brand-telegram" style="color:#854F0B" aria-hidden="true"></i></div>
+            <div class="stat-val" id="stat-dms">4</div>
+            <div class="stat-label">Total percakapan</div>
+            <div class="stat-delta" style="color:#854F0B"><i class="ti ti-point" aria-hidden="true"></i> 2 belum dibaca</div>
+          </div>
+        </div>
+
+        <div class="section-head"><div class="section-title">Aktivitas terbaru</div></div>
+        <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden">
+          <table class="data-table">
+            <thead><tr><th>Waktu</th><th>Pengguna</th><th>Aksi</th><th>Detail</th></tr></thead>
+            <tbody id="activity-log">
+              <tr><td style="color:var(--color-text-secondary);font-size:12px">Baru saja</td><td><div class="avatar-cell"><div class="av-circle av-blue">AY</div>andi_yusuf</div></td><td><span class="chip chip-active">Post baru</span></td><td style="color:var(--color-text-secondary);font-size:12px">Sunset di Pantai Losari</td></tr>
+              <tr><td style="color:var(--color-text-secondary);font-size:12px">5 mnt lalu</td><td><div class="avatar-cell"><div class="av-circle av-pink">SR</div>siti_rahma</div></td><td><span class="chip" style="background:#E6F1FB;color:#185FA5">Komentar</span></td><td style="color:var(--color-text-secondary);font-size:12px">Keren banget! 😍</td></tr>
+              <tr><td style="color:var(--color-text-secondary);font-size:12px">12 mnt lalu</td><td><div class="avatar-cell"><div class="av-circle av-green">MB</div>maulana_b</div></td><td><span class="chip" style="background:#FBEAF0;color:#993556">Follow</span></td><td style="color:var(--color-text-secondary);font-size:12px">Mengikuti fitri_dewi</td></tr>
+              <tr><td style="color:var(--color-text-secondary);font-size:12px">1 jam lalu</td><td><div class="avatar-cell"><div class="av-circle av-amber">FD</div>fitri_dewi</div></td><td><span class="chip chip-active">Post baru</span></td><td style="color:var(--color-text-secondary);font-size:12px">Pulau Samalona ️</td></tr>
+              <tr><td style="color:var(--color-text-secondary);font-size:12px">2 jam lalu</td><td><div class="avatar-cell"><div class="av-circle av-teal">RH</div>reza_h</div></td><td><span class="chip" style="background:#FCEBEB;color:#A32D2D">Like</span></td><td style="color:var(--color-text-secondary);font-size:12px">Like 3 postingan</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="page" id="page-users">
+        <div class="section-head">
+          <div class="section-title">Kelola pengguna <span id="user-count" style="font-size:12px;color:var(--color-text-secondary);font-weight:400">— 6 pengguna</span></div>
+          <button class="btn btn-primary" onclick="openModal('user-modal','tambah')"><i class="ti ti-plus" aria-hidden="true"></i> Tambah pengguna</button>
+        </div>
+        <div class="search-bar">
+          <i class="ti ti-search" aria-hidden="true"></i>
+          <input type="text" placeholder="Cari username, nama, atau email..." oninput="filterUsers(this.value)" id="user-search">
+        </div>
+        <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden">
+          <table class="data-table" style="table-layout:fixed">
+            <thead><tr><th style="width:34%">Pengguna</th><th style="width:26%">Email</th><th style="width:14%">Role</th><th style="width:14%">Status</th><th style="width:12%">Aksi</th></tr></thead>
+            <tbody id="user-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- POSTS -->
+      <div class="page" id="page-posts">
+        <div class="section-head">
+          <div class="section-title">Kelola postingan <span id="post-count-label" style="font-size:12px;color:var(--color-text-secondary);font-weight:400">— 5 postingan</span></div>
+        </div>
+        <div class="search-bar">
+          <i class="ti ti-search" aria-hidden="true"></i>
+          <input type="text" placeholder="Cari caption atau username..." oninput="filterPosts(this.value)">
+        </div>
+        <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden">
+          <table class="data-table" style="table-layout:fixed">
+            <thead><tr><th style="width:40%">Post</th><th style="width:20%">Pengguna</th><th style="width:12%">Like</th><th style="width:12%">Komentar</th><th style="width:16%">Aksi</th></tr></thead>
+            <tbody id="post-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- COMMENTS -->
+      <div class="page" id="page-comments">
+        <div class="section-head">
+          <div class="section-title">Kelola komentar <span id="comment-count-label" style="font-size:12px;color:var(--color-text-secondary);font-weight:400">— 8 komentar</span></div>
+        </div>
+        <div class="search-bar">
+          <i class="ti ti-search" aria-hidden="true"></i>
+          <input type="text" placeholder="Cari isi komentar atau username..." oninput="filterComments(this.value)">
+        </div>
+        <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden">
+          <table class="data-table" style="table-layout:fixed">
+            <thead><tr><th style="width:42%">Komentar</th><th style="width:22%">Pengguna</th><th style="width:24%">Di postingan</th><th style="width:12%">Aksi</th></tr></thead>
+            <tbody id="comment-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DM -->
+      <div class="page" id="page-dm">
+        <div class="section-head">
+          <div class="section-title">Monitor chat / DM</div>
+          <span style="font-size:12px;color:var(--color-text-secondary)">Moderator dapat melihat dan menghapus percakapan yang melanggar aturan</span>
+        </div>
+        <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden">
+          <div class="dm-list" id="dm-list-body"></div>
+        </div>
+        <div id="dm-detail" style="display:none;margin-top:14px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden">
+          <div style="padding:12px 14px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between">
+            <div id="dm-detail-title" style="font-size:13px;font-weight:500;color:var(--color-text-primary)"></div>
+            <button class="btn btn-sm btn-danger" onclick="deleteConvo()"><i class="ti ti-trash" aria-hidden="true"></i> Hapus percakapan</button>
+          </div>
+          <div id="dm-messages" style="padding:14px;display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal tambah/edit user -->
+<div class="modal-backdrop" id="user-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Tambah pengguna</div>
+    <div class="form-row"><label class="form-label">Nama lengkap</label><input class="form-input" id="f-name" placeholder="Andi Yusuf"></div>
+    <div class="form-row"><label class="form-label">Username</label><input class="form-input" id="f-username" placeholder="andi_yusuf"></div>
+    <div class="form-row"><label class="form-label">Email</label><input class="form-input" id="f-email" placeholder="andi@email.com" type="email"></div>
+    <div class="form-row"><label class="form-label">Role</label>
+      <select class="form-select" id="f-role"><option value="user">User</option><option value="moderator">Moderator</option></select>
+    </div>
+    <div class="form-row"><label class="form-label">Status</label>
+      <select class="form-select" id="f-status"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('user-modal')">Batal</button>
+      <button class="btn btn-primary" onclick="saveUser()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <i class="ti" id="toast-icon" aria-hidden="true"></i>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+var users=[
+  {id:1,name:'Andi Yusuf',username:'andi_yusuf',email:'andi@email.com',role:'user',status:'active',initials:'AY',color:'av-blue'},
+  {id:2,name:'Siti Rahma',username:'siti_rahma',email:'siti@email.com',role:'user',status:'active',initials:'SR',color:'av-pink'},
+  {id:3,name:'Maulana Budi',username:'maulana_b',email:'maulana@email.com',role:'user',status:'active',initials:'MB',color:'av-green'},
+  {id:4,name:'Fitri Dewi',username:'fitri_dewi',email:'fitri@email.com',role:'user',status:'active',initials:'FD',color:'av-amber'},
+  {id:5,name:'Reza Hasni',username:'reza_h',email:'reza@email.com',role:'user',status:'active',initials:'RH',color:'av-teal'},
+  {id:6,name:'Admin SosialKita',username:'admin_sk',email:'admin@sosialkita.app',role:'moderator',status:'active',initials:'AS',color:'av-red'}
+];
+var posts=[
+  {id:1,userId:1,caption:'Sunset di Pantai Losari selalu bikin kagum ✨',emoji:'🌅',likes:4,comments:3,time:'2 jam lalu'},
+  {id:2,userId:2,caption:'Coto Makassar terenak yang pernah aku coba! 🍲',emoji:'🍲',likes:2,comments:2,time:'5 jam lalu'},
+  {id:3,userId:3,caption:'Sudut kota Makassar yang penuh cerita 📸',emoji:'📸',likes:2,comments:1,time:'8 jam lalu'},
+  {id:4,userId:4,caption:'Pulau Samalona, surga tersembunyi di Makassar 🏝️',emoji:'🏝️',likes:4,comments:2,time:'1 hari lalu'},
+  {id:5,userId:5,caption:'Weekend vibes ☕ Kopi toraja favorit',emoji:'☕',likes:1,comments:0,time:'1 hari lalu'}
+];
+var comments=[
+  {id:1,postId:1,userId:2,text:'Keren banget! Kapan-kapan mau kesana juga 😍',time:'1 jam lalu'},
+  {id:2,postId:1,userId:3,text:'Fotonya bagus! Pakai kamera apa?',time:'1 jam lalu'},
+  {id:3,postId:1,userId:4,text:'Losari memang selalu hits!',time:'45 mnt lalu'},
+  {id:4,postId:2,userId:1,text:'Coto Makassar emang juara!',time:'4 jam lalu'},
+  {id:5,postId:2,userId:4,text:'Share alamatnya dong kak!',time:'3 jam lalu'},
+  {id:6,postId:3,userId:1,text:'Keren sudut jalan ini!',time:'7 jam lalu'},
+  {id:7,postId:4,userId:1,text:'Wah bagus banget! Mau liburan kesana',time:'20 jam lalu'},
+  {id:8,postId:4,userId:2,text:'Air lautnya jernih banget ya 😍',time:'18 jam lalu'}
+];
+var dms=[
+  {id:1,from:'siti_rahma',to:'andi_yusuf',fromInit:'SR',fromColor:'av-pink',unread:1,lastMsg:'Oke siap! Btw resep coto-nya mau dishare ga?',time:'20 mnt',messages:[
+    {sender:'andi_yusuf',text:'Hei Siti! Sunset kemarin keren banget kan?',mine:true},
+    {sender:'siti_rahma',text:'Iya! Aku liat di feed, bagus banget 😍',mine:false},
+    {sender:'andi_yusuf',text:'Makasih! Datang aja sendiri, tiap sore bagus',mine:true},
+    {sender:'siti_rahma',text:'Oke siap! Btw resep coto-nya mau dishare ga?',mine:false}
+  ]},
+  {id:2,from:'fitri_dewi',to:'andi_yusuf',fromInit:'FD',fromColor:'av-amber',unread:1,lastMsg:'Kapan ke Pulau Samalona lagi?',time:'5 mnt',messages:[
+    {sender:'fitri_dewi',text:'Kak Andi, kapan ke Pulau Samalona lagi?',mine:false},
+    {sender:'andi_yusuf',text:'Minggu depan mungkin, mau ikut?',mine:true},
+    {sender:'fitri_dewi',text:'Kapan ke Pulau Samalona lagi?',mine:false}
+  ]},
+  {id:3,from:'maulana_b',to:'andi_yusuf',fromInit:'MB',fromColor:'av-green',unread:0,lastMsg:'Pakai golden hour jam 5-6 sore...',time:'Kemarin',messages:[
+    {sender:'maulana_b',text:'Kak, tips foto golden hour dong!',mine:false},
+    {sender:'andi_yusuf',text:'Pakai golden hour jam 5-6 sore, cahaya lebih warm 🌅',mine:true}
+  ]},
+  {id:4,from:'reza_h',to:'andi_yusuf',fromInit:'RH',fromColor:'av-teal',unread:0,lastMsg:'Kopi Kulo, Jl. AP Pettarani ☕',time:'2 hari',messages:[
+    {sender:'reza_h',text:'Rekomen cafe enak di Makassar dong!',mine:false},
+    {sender:'andi_yusuf',text:'Kopi Kulo, Jl. AP Pettarani ☕ Enak banget!',mine:true}
+  ]}
+];
+
+var editingUserId=null;
+var activeConvoId=null;
+
+function getUserById(id){return users.find(u=>u.id===id)}
+
+function renderUsers(list){
+  var tb=document.getElementById('user-table-body');
+  if(!list||!list.length){tb.innerHTML='<tr><td colspan="5"><div class="empty-state"><i class="ti ti-users-off"></i>Tidak ada pengguna ditemukan</div></td></tr>';return;}
+  tb.innerHTML=list.map(function(u){
+    return '<tr><td><div class="avatar-cell"><div class="av-circle '+u.color+'">'+u.initials+'</div><div><div style="font-size:13px;font-weight:500">'+u.name+'</div><div style="font-size:11px;color:var(--color-text-secondary)">@'+u.username+'</div></div></div></td>'
+    +'<td style="font-size:12px;color:var(--color-text-secondary)">'+u.email+'</td>'
+    +'<td><span class="chip '+(u.role==='moderator'?'chip-mod':'chip-user')+'">'+u.role+'</span></td>'
+    +'<td><span class="chip '+(u.status==='active'?'chip-active':'chip-inactive')+'">'+u.status+'</span></td>'
+    +'<td style="display:flex;gap:4px;align-items:center">'
+    +'<button class="btn btn-sm" onclick="editUser('+u.id+')" title="Edit"><i class="ti ti-edit" aria-hidden="true"></i></button>'
+    +(u.role!=='moderator'?'<button class="btn btn-sm btn-danger" onclick="deleteUser('+u.id+')" title="Hapus"><i class="ti ti-trash" aria-hidden="true"></i></button>':'')
+    +'</td></tr>';
+  }).join('');
+  document.getElementById('user-count').textContent='— '+list.length+' pengguna';
+  document.getElementById('stat-users').textContent=users.length;
+}
+
+function renderPosts(list){
+  var tb=document.getElementById('post-table-body');
+  if(!list||!list.length){tb.innerHTML='<tr><td colspan="5"><div class="empty-state"><i class="ti ti-photo-off"></i>Tidak ada postingan</div></td></tr>';return;}
+  tb.innerHTML=list.map(function(p){
+    var u=getUserById(p.userId);
+    return '<tr><td><div class="avatar-cell"><div class="post-thumb">'+p.emoji+'</div><div style="font-size:12px;color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">'+p.caption+'</div></div></td>'
+    +'<td><div class="avatar-cell"><div class="av-circle '+(u?u.color:'av-blue')+'" style="width:24px;height:24px;font-size:10px">'+(u?u.initials:'?')+'</div><span style="font-size:12px">@'+(u?u.username:'?')+'</span></div></td>'
+    +'<td style="font-size:13px"><i class="ti ti-heart" style="color:#E24B4A;font-size:13px" aria-hidden="true"></i> '+p.likes+'</td>'
+    +'<td style="font-size:13px"><i class="ti ti-message" style="color:#185FA5;font-size:13px" aria-hidden="true"></i> '+p.comments+'</td>'
+    +'<td><button class="btn btn-sm btn-danger" onclick="deletePost('+p.id+')"><i class="ti ti-trash" aria-hidden="true"></i> Hapus</button></td></tr>';
+  }).join('');
+  document.getElementById('post-count-label').textContent='— '+list.length+' postingan';
+  document.getElementById('stat-posts').textContent=posts.length;
+}
+
+function renderComments(list){
+  var tb=document.getElementById('comment-table-body');
+  if(!list||!list.length){tb.innerHTML='<tr><td colspan="4"><div class="empty-state"><i class="ti ti-message-off"></i>Tidak ada komentar</div></td></tr>';return;}
+  tb.innerHTML=list.map(function(c){
+    var u=getUserById(c.userId);
+    var p=posts.find(function(x){return x.id===c.postId});
+    return '<tr><td style="font-size:13px;color:var(--color-text-primary)">'+c.text+'<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:2px">'+c.time+'</div></td>'
+    +'<td><div class="avatar-cell"><div class="av-circle '+(u?u.color:'av-blue')+'" style="width:24px;height:24px;font-size:10px">'+(u?u.initials:'?')+'</div><span style="font-size:12px">@'+(u?u.username:'?')+'</span></div></td>'
+    +'<td style="font-size:12px;color:var(--color-text-secondary)">'+(p?p.emoji+' '+p.caption.substring(0,28)+'...':'—')+'</td>'
+    +'<td><button class="btn btn-sm btn-danger" onclick="deleteComment('+c.id+')"><i class="ti ti-trash" aria-hidden="true"></i> Hapus</button></td></tr>';
+  }).join('');
+  document.getElementById('comment-count-label').textContent='— '+list.length+' komentar';
+  document.getElementById('stat-comments').textContent=comments.length;
+}
+
+function renderDMs(){
+  var dl=document.getElementById('dm-list-body');
+  dl.innerHTML=dms.map(function(d){
+    return '<div class="dm-item" onclick="openConvo('+d.id+')">'
+    +'<div class="av-circle '+d.fromColor+'" style="width:36px;height:36px;font-size:13px">'+d.fromInit+'</div>'
+    +'<div class="dm-meta">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center"><span class="dm-name">'+d.from+' → '+d.to+'</span><span class="dm-time">'+d.time+'</span></div>'
+    +'<div class="dm-preview">'+d.lastMsg+'</div>'
+    +'</div>'
+    +(d.unread>0?'<div class="unread-dot"></div>':'')
+    +'</div>';
+  }).join('');
+  document.getElementById('stat-dms').textContent=dms.length;
+}
+
+function openConvo(id){
+  activeConvoId=id;
+  var d=dms.find(function(x){return x.id===id;});
+  if(!d)return;
+  d.unread=0;
+  renderDMs();
+  document.getElementById('dm-detail').style.display='block';
+  document.getElementById('dm-detail-title').textContent='Percakapan: '+d.from+' dengan '+d.to;
+  var msgDiv=document.getElementById('dm-messages');
+  msgDiv.innerHTML=d.messages.map(function(m){
+    return '<div style="display:flex;justify-content:'+(m.mine?'flex-end':'flex-start')+'">'
+    +'<div style="max-width:70%;background:'+(m.mine?'#FBEAF0':'var(--color-background-secondary)')+';border:0.5px solid '+(m.mine?'#F4C0D1':'var(--color-border-tertiary)')+';border-radius:var(--border-radius-lg);padding:7px 11px">'
+    +'<div style="font-size:11px;font-weight:500;color:'+(m.mine?'#993556':'var(--color-text-secondary)')+';margin-bottom:3px">'+m.sender+'</div>'
+    +'<div style="font-size:13px;color:var(--color-text-primary)">'+m.text+'</div>'
+    +'</div></div>';
+  }).join('');
+}
+
+function deleteConvo(){
+  if(activeConvoId===null)return;
+  dms=dms.filter(function(d){return d.id!==activeConvoId;});
+  activeConvoId=null;
+  document.getElementById('dm-detail').style.display='none';
+  renderDMs();
+  showToast('Percakapan dihapus','ti-trash');
+}
+
+function filterUsers(q){
+  var f=q.toLowerCase();
+  renderUsers(users.filter(function(u){return u.username.includes(f)||u.name.toLowerCase().includes(f)||u.email.includes(f);}));
+}
+function filterPosts(q){
+  var f=q.toLowerCase();
+  renderPosts(posts.filter(function(p){
+    var u=getUserById(p.userId);
+    return p.caption.toLowerCase().includes(f)||(u&&u.username.includes(f));
+  }));
+}
+function filterComments(q){
+  var f=q.toLowerCase();
+  renderComments(comments.filter(function(c){
+    var u=getUserById(c.userId);
+    return c.text.toLowerCase().includes(f)||(u&&u.username.includes(f));
+  }));
+}
+
+function deleteUser(id){
+  users=users.filter(function(u){return u.id!==id;});
+  renderUsers(users);
+  showToast('Pengguna dihapus','ti-trash');
+}
+function deletePost(id){
+  posts=posts.filter(function(p){return p.id!==id;});
+  renderPosts(posts);
+  showToast('Postingan dihapus','ti-trash');
+}
+function deleteComment(id){
+  comments=comments.filter(function(c){return c.id!==id;});
+  renderComments(comments);
+  showToast('Komentar dihapus','ti-trash');
+}
+
+function openModal(modalId,mode){
+  editingUserId=null;
+  document.getElementById('modal-title').textContent='Tambah pengguna';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-username').value='';
+  document.getElementById('f-email').value='';
+  document.getElementById('f-role').value='user';
+  document.getElementById('f-status').value='active';
+  document.getElementById(modalId).classList.add('open');
+}
+function editUser(id){
+  var u=users.find(function(x){return x.id===id;});
+  if(!u)return;
+  editingUserId=id;
+  document.getElementById('modal-title').textContent='Edit pengguna';
+  document.getElementById('f-name').value=u.name;
+  document.getElementById('f-username').value=u.username;
+  document.getElementById('f-email').value=u.email;
+  document.getElementById('f-role').value=u.role;
+  document.getElementById('f-status').value=u.status;
+  document.getElementById('user-modal').classList.add('open');
+}
+function closeModal(modalId){document.getElementById(modalId).classList.remove('open');}
+function saveUser(){
+  var name=document.getElementById('f-name').value.trim();
+  var username=document.getElementById('f-username').value.trim();
+  var email=document.getElementById('f-email').value.trim();
+  var role=document.getElementById('f-role').value;
+  var status=document.getElementById('f-status').value;
+  if(!name||!username||!email){showToast('Semua field wajib diisi','ti-alert-circle');return;}
+  var colors=['av-blue','av-pink','av-green','av-amber','av-teal','av-red'];
+  if(editingUserId!==null){
+    var idx=users.findIndex(function(u){return u.id===editingUserId;});
+    if(idx>-1){users[idx].name=name;users[idx].username=username;users[idx].email=email;users[idx].role=role;users[idx].status=status;}
+    showToast('Pengguna diperbarui','ti-check');
+  } else {
+    var newId=users.length?Math.max.apply(null,users.map(function(u){return u.id;}))+1:1;
+    var initials=(name.split(' ').map(function(w){return w[0]||'';}).join('').substring(0,2)).toUpperCase();
+    users.push({id:newId,name:name,username:username,email:email,role:role,status:status,initials:initials,color:colors[newId%colors.length]});
+    showToast('Pengguna ditambahkan','ti-check');
+  }
+  closeModal('user-modal');
+  renderUsers(users);
+}
+
+function switchPage(name,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.mod-nav-item').forEach(function(n){n.classList.remove('active');});
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+  if(name==='users')renderUsers(users);
+  if(name==='posts')renderPosts(posts);
+  if(name==='comments')renderComments(comments);
+  if(name==='dm')renderDMs();
+}
+
+function showToast(msg,icon){
+  var t=document.getElementById('toast');
+  var ti=document.getElementById('toast-icon');
+  var tm=document.getElementById('toast-msg');
+  ti.className='ti '+(icon||'ti-check');
+  tm.textContent=msg;
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2500);
+}
+
+renderUsers(users);
+renderPosts(posts);
+renderComments(comments);
+</script>

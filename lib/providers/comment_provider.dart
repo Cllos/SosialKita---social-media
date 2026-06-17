@@ -7,6 +7,9 @@ import '../core/utils/dummy_data.dart';
 import '../services/local_storage_service.dart';
 import '../services/api_service.dart';
 import 'post_provider.dart';
+import 'auth_provider.dart';
+import 'notification_provider.dart';
+import '../models/notification_model.dart';
 
 /// CommentProvider — mengelola state komentar dengan API Backend MySQL
 class CommentProvider extends ChangeNotifier {
@@ -69,7 +72,25 @@ class CommentProvider extends ChangeNotifier {
         _commentsCache[postId]!.add(newComment);
         
         // Sync jumlah komentar di PostProvider
-        Provider.of<PostProvider>(context, listen: false).incrementCommentCount(postId);
+        final postProvider = Provider.of<PostProvider>(context, listen: false);
+        postProvider.incrementCommentCount(postId);
+
+        // Tambah notifikasi komentar baru jika bukan komentar milik diri sendiri
+        final currentUserId = Provider.of<AuthProvider>(context, listen: false).currentUser?.id ?? '';
+        final post = postProvider.getPostById(postId);
+        if (post != null && post.userId != currentUserId) {
+          Provider.of<NotificationProvider>(context, listen: false).addNotification(
+            NotificationModel(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              type: NotificationType.comment,
+              fromUserId: currentUserId,
+              postId: postId,
+              commentText: text,
+              createdAt: DateTime.now(),
+              isRead: false,
+            ),
+          );
+        }
 
         notifyListeners();
         return true;
