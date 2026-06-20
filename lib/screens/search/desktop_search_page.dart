@@ -6,9 +6,13 @@ import '../../core/utils/dummy_data.dart';
 import '../../core/utils/time_ago.dart';
 import '../../models/post_model.dart';
 import '../../models/user_model.dart';
+import '../../models/comment_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/post_provider.dart';
+import '../../providers/comment_provider.dart';
+import '../../providers/notification_provider.dart';
 import '../../providers/user_provider.dart';
+import '../../models/notification_model.dart';
 import '../../widgets/common/sk_avatar.dart';
 import '../../widgets/layout/desktop_sidebar.dart';
 import '../profile/other_profile_screen.dart';
@@ -444,18 +448,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
           post: post,
           user: postUser,
           query: _query,
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Detail postingan — segera hadir'),
-                backgroundColor: AppColors.skCard,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
-          },
+          onTap: () => _showDesktopPostDetail(context, post),
         );
       },
     );
@@ -513,6 +506,25 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
       ),
     );
   }
+
+  /// Menampilkan dialog detail postingan (Instagram-style: gambar kiri + info kanan)
+  static void _showDesktopPostDetail(BuildContext context, PostModel post) {
+    UserModel? postUser;
+    try {
+      postUser = dummyUsers.firstWhere((u) => u.id == post.userId);
+    } catch (_) {}
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.7),
+      builder: (dialogCtx) {
+        return _DesktopPostDetailDialog(
+          post: post,
+          postUser: postUser,
+        );
+      },
+    );
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -544,17 +556,7 @@ class _DesktopExploreTileState extends State<_DesktopExploreTile> {
       onExit: (_) => setState(() => _hovered = false),
       child: GestureDetector(
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Detail postingan — segera hadir'),
-              backgroundColor: AppColors.skCard,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              duration: const Duration(seconds: 1),
-            ),
-          );
+          _DesktopSearchPageState._showDesktopPostDetail(context, widget.post);
         },
         child: Container(
           decoration: const BoxDecoration(
@@ -962,6 +964,507 @@ class _DesktopPostResultTileState extends State<_DesktopPostResultTile> {
           height: 1.4,
         ),
         children: spans,
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  DESKTOP POST DETAIL DIALOG — Instagram-style split layout
+// ══════════════════════════════════════════════════════════════
+
+class _DesktopPostDetailDialog extends StatefulWidget {
+  final PostModel post;
+  final UserModel? postUser;
+
+  const _DesktopPostDetailDialog({
+    required this.post,
+    this.postUser,
+  });
+
+  @override
+  State<_DesktopPostDetailDialog> createState() => _DesktopPostDetailDialogState();
+}
+
+class _DesktopPostDetailDialogState extends State<_DesktopPostDetailDialog> {
+  final TextEditingController _commentController = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) {
+        context.read<CommentProvider>().fetchComments(widget.post.id);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  void _onSubmitComment() async {
+    final text = _commentController.text.trim();
+    if (text.isEmpty || _isSubmitting) return;
+
+    setState(() => _isSubmitting = true);
+    final success = await context
+        .read<CommentProvider>()
+        .addComment(context, widget.post.id, text);
+
+    if (success) {
+      _commentController.clear();
+    }
+    if (mounted) setState(() => _isSubmitting = false);
+  }
+
+  void _onToggleLike() {
+    final auth = context.read<AuthProvider>();
+    final postProvider = context.read<PostProvider>();
+    final currentUserId = auth.currentUser?.id ?? '';
+
+    final wasLiked = postProvider.isLiked(widget.post.id, currentUserId);
+    postProvider.toggleLike(widget.post.id, currentUserId);
+
+    // Tambah notifikasi like jika bukan postingan sendiri
+    if (!wasLiked && widget.post.userId != currentUserId) {
+      context.read<NotificationProvider>().addNotification(
+        NotificationModel(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          type: NotificationType.like,
+          fromUserId: currentUserId,
+          postId: widget.post.id,
+          createdAt: DateTime.now(),
+          isRead: false,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final postProvider = context.watch<PostProvider>();
+    final commentProvider = context.watch<CommentProvider>();
+    final currentUserId = auth.currentUser?.id ?? '';
+    final isLiked = postProvider.isLiked(widget.post.id, currentUserId);
+    final post = postProvider.getPostById(widget.post.id) ?? widget.post;
+    final comments = commentProvider.getCommentsForPost(widget.post.id);
+    final commentCount = postProvider.getCommentCount(widget.post.id);
+    final user = widget.postUser;
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final dialogWidth = (screenWidth * 0.7).clamp(600.0, 960.0);
+    final dialogHeight = (MediaQuery.of(context).size.height * 0.75).clamp(400.0, 640.0);
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(32),
+      child: Container(
+        width: dialogWidth,
+        height: dialogHeight,
+        decoration: BoxDecoration(
+          color: AppColors.skDark2,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              blurRadius: 40,
+              spreadRadius: 10,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Row(
+            children: [
+              // ── Gambar Kiri ──
+              Expanded(
+                flex: 3,
+                child: Container(
+                  color: AppColors.skDark,
+                  child: post.imageUrl.isNotEmpty
+                      ? PostImage(
+                          imageUrl: post.imageUrl,
+                          fit: BoxFit.contain,
+                        )
+                      : Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.article_outlined, size: 48,
+                                  color: AppColors.skMuted.withOpacity(0.3)),
+                              const SizedBox(height: 10),
+                              Text(
+                                post.caption.length > 60
+                                    ? '${post.caption.substring(0, 60)}...'
+                                    : post.caption,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'DM Sans',
+                                  fontSize: 14,
+                                  color: AppColors.skMuted.withOpacity(0.6),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                ),
+              ),
+
+              // ── Divider vertikal ──
+              Container(width: 1, color: Colors.white.withOpacity(0.06)),
+
+              // ── Info Kanan ──
+              Expanded(
+                flex: 2,
+                child: Column(
+                  children: [
+                    // Header — Author info + close
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.white.withOpacity(0.06)),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          if (user != null) ...[
+                            SKAvatar(
+                              initials: user.avatarInitials,
+                              backgroundColor: user.avatarColor,
+                              imageUrl: user.avatarUrl,
+                              size: 34,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user.displayName,
+                                    style: const TextStyle(
+                                      fontFamily: 'DM Sans',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.skWhite,
+                                    ),
+                                  ),
+                                  if (post.location.isNotEmpty)
+                                    Text(
+                                      post.location,
+                                      style: TextStyle(
+                                        fontFamily: 'DM Sans',
+                                        fontSize: 11,
+                                        color: AppColors.skMuted.withOpacity(0.6),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ] else
+                            const Expanded(
+                              child: Text('Pengguna',
+                                  style: TextStyle(
+                                      fontFamily: 'DM Sans',
+                                      fontSize: 14,
+                                      color: AppColors.skWhite)),
+                            ),
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withOpacity(0.06),
+                              ),
+                              child: const Icon(Icons.close, size: 14, color: AppColors.skMuted),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Caption
+                    if (post.caption.isNotEmpty)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(color: Colors.white.withOpacity(0.04)),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              post.caption,
+                              style: const TextStyle(
+                                fontFamily: 'DM Sans',
+                                fontSize: 13,
+                                color: AppColors.skWhite,
+                                height: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            // Tags
+                            if (post.tags.isNotEmpty)
+                              Wrap(
+                                spacing: 6,
+                                children: post.tags.map((tag) {
+                                  return Text(
+                                    '#$tag',
+                                    style: TextStyle(
+                                      fontFamily: 'DM Sans',
+                                      fontSize: 12,
+                                      color: AppColors.skViolet.withOpacity(0.8),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            const SizedBox(height: 6),
+                            Text(
+                              timeAgo(post.createdAt),
+                              style: TextStyle(
+                                fontFamily: 'DM Sans',
+                                fontSize: 11,
+                                color: AppColors.skMuted.withOpacity(0.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // Like & Comment count bar
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.white.withOpacity(0.04)),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // Like button
+                          GestureDetector(
+                            onTap: _onToggleLike,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: Icon(
+                                isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                                key: ValueKey(isLiked),
+                                size: 22,
+                                color: isLiked ? AppColors.skRose : AppColors.skMuted,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${post.likes.length}',
+                            style: const TextStyle(
+                              fontFamily: 'DM Sans',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.skWhite,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Icon(Icons.chat_bubble_outline_rounded,
+                              size: 20, color: AppColors.skMuted),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${commentCount > 0 ? commentCount : comments.length}',
+                            style: const TextStyle(
+                              fontFamily: 'DM Sans',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.skWhite,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Comments section
+                    Expanded(
+                      child: commentProvider.isLoading
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.skRose,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : comments.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.chat_bubble_outline,
+                                          size: 28,
+                                          color: AppColors.skMuted.withOpacity(0.3)),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Belum ada komentar',
+                                        style: TextStyle(
+                                          fontFamily: 'DM Sans',
+                                          fontSize: 12,
+                                          color: AppColors.skMuted.withOpacity(0.5),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Jadilah yang pertama berkomentar!',
+                                        style: TextStyle(
+                                          fontFamily: 'DM Sans',
+                                          fontSize: 11,
+                                          color: AppColors.skMuted.withOpacity(0.3),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  physics: const BouncingScrollPhysics(),
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  itemCount: comments.length,
+                                  itemBuilder: (context, index) {
+                                    return _buildCommentTile(comments[index]);
+                                  },
+                                ),
+                    ),
+
+                    // Comment input
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: Colors.white.withOpacity(0.06)),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _commentController,
+                              style: const TextStyle(
+                                fontFamily: 'DM Sans',
+                                fontSize: 13,
+                                color: AppColors.skWhite,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: 'Tulis komentar...',
+                                hintStyle: TextStyle(
+                                  fontFamily: 'DM Sans',
+                                  fontSize: 13,
+                                  color: AppColors.skMuted.withOpacity(0.4),
+                                ),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                              ),
+                              onSubmitted: (_) => _onSubmitComment(),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: _onSubmitComment,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: AppColors.skGradientBtn,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: _isSubmitting
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.send_rounded, size: 16, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommentTile(CommentModel comment) {
+    UserModel? commentUser;
+    try {
+      commentUser = dummyUsers.firstWhere((u) => u.id == comment.userId);
+    } catch (_) {}
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SKAvatar(
+            initials: commentUser?.avatarInitials ?? 'U',
+            backgroundColor: commentUser?.avatarColor ?? Colors.grey,
+            imageUrl: commentUser?.avatarUrl ?? '',
+            size: 28,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontFamily: 'DM Sans',
+                      fontSize: 12.5,
+                      color: AppColors.skWhite,
+                      height: 1.4,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '${commentUser?.username ?? 'user'} ',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      TextSpan(
+                        text: comment.text,
+                        style: TextStyle(
+                          color: AppColors.skWhite.withOpacity(0.8),
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  timeAgo(comment.createdAt),
+                  style: TextStyle(
+                    fontFamily: 'DM Sans',
+                    fontSize: 10,
+                    color: AppColors.skMuted.withOpacity(0.5),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
