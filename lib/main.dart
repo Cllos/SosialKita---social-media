@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/responsive_layout.dart';
 import 'providers/auth_provider.dart';
@@ -14,13 +16,22 @@ import 'screens/home/home_screen.dart';
 import 'screens/moderator/moderator_dashboard.dart';
 import 'screens/moderator/desktop_only_screen.dart';
 import 'services/local_storage_service.dart';
+import 'services/fcm_service.dart';
 
 Future<void> main() async {
   // Wajib dipanggil sebelum inisialisasi plugin apapun
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Inisialisasi Firebase Core
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   // Inisialisasi SharedPreferences
   await LocalStorageService.init();
+
+  // Inisialisasi Firebase Cloud Messaging
+  await FcmService.instance.initialize();
 
   runApp(const SosialKitaApp());
 }
@@ -44,6 +55,12 @@ class SosialKitaApp extends StatelessWidget {
         title: 'SosialKita',
         debugShowCheckedModeBanner: false,
         theme: buildAppTheme(),
+        builder: (context, child) {
+          // Set notification provider ke FcmService agar bisa update UI
+          final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+          FcmService.setNotificationProvider(notificationProvider);
+          return child!;
+        },
         home: Consumer<AuthProvider>(
           builder: (context, auth, _) {
             if (auth.isLoggedIn) {

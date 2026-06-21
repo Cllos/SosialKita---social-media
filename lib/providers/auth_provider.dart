@@ -6,6 +6,7 @@ import '../models/user_model.dart';
 import '../core/utils/dummy_data.dart';
 import '../services/local_storage_service.dart';
 import '../services/api_service.dart';
+import '../services/fcm_service.dart';
 
 /// AuthProvider — mengelola state autentikasi dengan API Backend MySQL
 class AuthProvider extends ChangeNotifier {
@@ -46,6 +47,9 @@ class AuthProvider extends ChangeNotifier {
           _currentUser = _userFromJson(body['data']);
           _isLoggedIn = true;
           notifyListeners();
+
+          // Update FCM Token ke Backend
+          _updateFcmTokenOnBackend();
         } else {
           await logout();
         }
@@ -81,6 +85,10 @@ class AuthProvider extends ChangeNotifier {
         
         await _storage.saveSession(_currentUser!.id);
         notifyListeners();
+
+        // Update FCM Token ke Backend
+        _updateFcmTokenOnBackend();
+
         return true;
       }
     } catch (e) {
@@ -123,6 +131,10 @@ class AuthProvider extends ChangeNotifier {
 
         await _storage.saveSession(_currentUser!.id);
         notifyListeners();
+
+        // Update FCM Token ke Backend
+        _updateFcmTokenOnBackend();
+
         return null; // success
       } else {
         if (body['errors'] is List && (body['errors'] as List).isNotEmpty) {
@@ -152,6 +164,8 @@ class AuthProvider extends ChangeNotifier {
   /// Logout dari Backend
   Future<void> logout() async {
     try {
+      // Hapus FCM Token di backend sebelum logout agar tidak menerima notifikasi lagi
+      await ApiService.put('/users/fcm-token', {'fcm_token': null});
       await ApiService.post('/auth/logout', null);
     } catch (_) {}
     _currentUser = null;
@@ -284,5 +298,25 @@ class AuthProvider extends ChangeNotifier {
       savedPosts: savedPosts,
       joinedAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : DateTime.now(),
     );
+  }
+
+  /// Mengambil FCM Token dan mengirimkannya ke Backend untuk update database
+  Future<void> _updateFcmTokenOnBackend() async {
+    try {
+      final fcmToken = await FcmService.instance.getToken();
+      if (fcmToken != null) {
+        debugPrint('[FCM] Mengunggah FCM Token ke Backend: $fcmToken');
+        final response = await ApiService.put('/users/fcm-token', {
+          'fcm_token': fcmToken,
+        });
+        if (response.statusCode == 200) {
+          debugPrint('[FCM] Berhasil memperbarui FCM Token di Backend.');
+        } else {
+          debugPrint('[FCM] Gagal memperbarui FCM Token di Backend: ${response.statusCode}');
+        }
+      }
+    } catch (e) {
+      debugPrint('[FCM] Error memperbarui FCM Token di Backend: $e');
+    }
   }
 }

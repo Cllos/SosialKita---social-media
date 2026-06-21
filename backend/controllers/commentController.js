@@ -1,6 +1,7 @@
-const { Comment, User } = require('../models');
+const { Comment, User, Post } = require('../models');
 const { success, error } = require('../utils/response');
 const { timeAgo } = require('../utils/timeAgo');
+const { sendPushNotification } = require('../utils/fcmSender');
 
 // GET /posts/:postId — Daftar komentar sebuah post
 exports.getComments = async (req, res) => {
@@ -39,6 +40,11 @@ exports.addComment = async (req, res) => {
       return error(res, 'Teks komentar tidak boleh kosong', 400);
     }
 
+    const post = await Post.findByPk(postId);
+    if (!post) {
+      return error(res, 'Post tidak ditemukan', 404);
+    }
+
     const comment = await Comment.create({
       user_id: req.user.id,
       post_id: postId,
@@ -52,6 +58,23 @@ exports.addComment = async (req, res) => {
         attributes: ['id', 'username', 'display_name', 'avatar_url']
       }]
     });
+
+    // Kirim push notifikasi ke pembuat postingan (jika bukan diri sendiri)
+    if (post.user_id !== req.user.id) {
+      sendPushNotification(
+        post.user_id,
+        'Komentar Baru',
+        `@${req.user.username} mengomentari postingan Anda: "${text}"`,
+        {
+          id: String(comment.id),
+          type: 'comment',
+          fromUserId: String(req.user.id),
+          postId: String(postId),
+          commentText: text,
+          createdAt: comment.created_at.toISOString(),
+        }
+      ).catch(err => console.error('Error sending comment push notification:', err));
+    }
 
     return success(res, {
       ...fullComment.toJSON(),

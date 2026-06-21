@@ -1,5 +1,6 @@
 const { Like, Post } = require('../models');
 const { success, error } = require('../utils/response');
+const { sendPushNotification } = require('../utils/fcmSender');
 
 // POST /posts/:postId — Toggle like/unlike
 exports.toggleLike = async (req, res) => {
@@ -27,6 +28,22 @@ exports.toggleLike = async (req, res) => {
       // Like
       await Like.create({ user_id: userId, post_id: postId });
       isLiked = true;
+
+      // Kirim push notifikasi ke pembuat postingan (jika bukan diri sendiri)
+      if (post.user_id !== userId) {
+        sendPushNotification(
+          post.user_id,
+          'Suka Baru',
+          `@${req.user.username} menyukai postingan Anda.`,
+          {
+            id: `like_${userId}_${postId}`,
+            type: 'like',
+            fromUserId: String(userId),
+            postId: String(postId),
+            createdAt: new Date().toISOString(),
+          }
+        ).catch(err => console.error('Error sending like push notification:', err));
+      }
     }
 
     const likeCount = await Like.count({ where: { post_id: postId } });

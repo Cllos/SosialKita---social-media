@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const { Message, User } = require('../models');
 const { success, error } = require('../utils/response');
 const { timeAgo } = require('../utils/timeAgo');
+const { sendPushNotification } = require('../utils/fcmSender');
 
 // GET /conversations — Daftar semua percakapan
 exports.getConversations = async (req, res) => {
@@ -119,6 +120,20 @@ exports.sendMessage = async (req, res) => {
         { model: User, as: 'receiver', attributes: ['id', 'username', 'display_name', 'avatar_url'] }
       ]
     });
+
+    // Kirim push notifikasi ke penerima pesan secara background
+    sendPushNotification(
+      parseInt(userId),
+      `Pesan baru dari @${fullMessage.sender.username}`,
+      text,
+      {
+        id: String(message.id),
+        type: 'message',
+        fromUserId: String(currentUserId),
+        commentText: text,
+        createdAt: message.created_at.toISOString(),
+      }
+    ).catch(err => console.error('Error sending message push notification:', err));
 
     return success(res, {
       ...fullMessage.toJSON(),

@@ -15,6 +15,9 @@ router.get('/:username', auth, userController.getProfile);
 // PUT /profile — Update profil sendiri
 router.put('/profile', auth, upload.single('avatar'), userController.updateProfile);
 
+// PUT /fcm-token — Update FCM token sendiri
+router.put('/fcm-token', auth, userController.updateFcmToken);
+
 // GET /:id/followers — Daftar follower user
 router.get('/:id/followers', auth, userController.getFollowers);
 

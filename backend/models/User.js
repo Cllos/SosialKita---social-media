@@ -41,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
     is_active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
+    },
+    fcm_token: {
+      type: DataTypes.STRING(255),
+      allowNull: true
     }
   }, {
     tableName: 'users',

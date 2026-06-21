@@ -1,5 +1,6 @@
 const { Follow, User } = require('../models');
 const { success, error } = require('../utils/response');
+const { sendPushNotification } = require('../utils/fcmSender');
 
 // POST /:userId — Toggle follow/unfollow user
 exports.toggleFollow = async (req, res) => {
@@ -32,6 +33,19 @@ exports.toggleFollow = async (req, res) => {
       // Follow
       await Follow.create({ follower_id: followerId, following_id: userId });
       isFollowing = true;
+
+      // Kirim push notifikasi ke user tujuan secara background
+      sendPushNotification(
+        parseInt(userId),
+        'Pengikut Baru',
+        `@${req.user.username} mulai mengikuti Anda.`,
+        {
+          id: `follow_${followerId}_${userId}`,
+          type: 'follow',
+          fromUserId: String(followerId),
+          createdAt: new Date().toISOString(),
+        }
+      ).catch(err => console.error('Error sending follow push notification:', err));
     }
 
     const followerCount = await Follow.count({ where: { following_id: userId } });

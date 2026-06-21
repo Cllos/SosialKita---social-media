@@ -176,3 +176,24 @@ exports.getProfileById = async (req, res) => {
     return error(res, 'Gagal mengambil profil');
   }
 };
+
+// PUT /fcm-token — Update FCM token user
+exports.updateFcmToken = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { fcm_token } = req.body;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return error(res, 'User tidak ditemukan', 404);
+    }
+
+    user.fcm_token = fcm_token || null;
+    await user.save();
+
+    return success(res, { fcm_token: user.fcm_token }, 'FCM token berhasil diperbarui');
+  } catch (err) {
+    console.error('Update FCM token error:', err);
+    return error(res, 'Gagal memperbarui FCM token');
+  }
+};
